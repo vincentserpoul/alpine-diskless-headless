@@ -7,6 +7,6 @@ WIP
 
 # THANKS
 
-https://github.com/knoopx/alpine-raspberry-pi
-https://github.com/yangxuan8282/gen-rpi_os/blob/master/gen-alpine_rpi.sh
-https://hütter.ch/posts/pitaya-alpine/#preparations
+- https://github.com/knoopx/alpine-raspberry-pi
+- https://github.com/yangxuan8282/gen-rpi_os/blob/master/gen-alpine_rpi.sh
+- https://hütter.ch/posts/pitaya-alpine/#preparations
