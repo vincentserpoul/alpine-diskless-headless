@@ -112,13 +112,12 @@ apk-tools-install() {
 
     # enabling dns resolution in chroot
     mkdir -p "$ROOTFS_DIR"/etc
-    cat /etc/resolv.conf >"$ROOTFS_DIR"/etc/resolv.conf
+    echo -e 'nameserver 8.8.8.8\nnameserver 2620:0:ccc::2' >"$ROOTFS_DIR"/etc/resolv.conf
 
     # copying apk-static
     mkdir -p "$ROOTFS_DIR"/usr/local/sbin/
     cp "$DIR_APK_TOOLS"/../apk-tools-static/sbin/apk.static "$ROOTFS_DIR"/usr/local/sbin/
 
-    # because otherwise /etc/apk/arch says x86
     # cp /bin/qemu-aarch64-static "$ROOTFS_DIR"/usr/local/sbin/
 
     alpine_get_keys "$ROOTFS_DIR"
@@ -133,5 +132,5 @@ apk-tools-install() {
         add alpine-base
 
     # cleanup
-    rm -rf "$ROOTFS_DIR"/usr/local/sbin/apk.static
+    rm "$ROOTFS_DIR"/usr/local/sbin/apk.static
 }
