@@ -15,7 +15,6 @@ if [[ ! -d "$DIR_BASE" ]]; then DIR_BASE="$PWD"; fi
 . """$DIR_BASE""/scripts/defaults.sh"
 . """$DIR_BASE""/scripts/helpers.sh"
 . """$DIR_BASE""/scripts/dev.sh"
-. """$DIR_BASE""/scripts/dev.sh"
 
 #================================= m a i n ====================================#
 
@@ -65,7 +64,7 @@ einfo "running alpine-diskless-headless-build"
 # /dev/sda partition, mount, copy files, umount
 if [ "$FORCE" == false ]; then
 	echo
-	read -p "Are you sure you want to format ""$DEVICE_NAME""?" -n 1 -r
+	read -p "Are you sure you want to format ""$DEVICE_NAME"" (Y/y)?" -n 1 -r
 	echo
 	if [[ ! $REPLY =~ ^[Yy]$ ]]; then
 		die "script stopped by user"
@@ -79,5 +78,7 @@ readonly MOUNT_POINT="$(dev-mount "$DEVICE_NAME")"
 tar xzf "$(helpers-hardware-filepath-get "$HARDWARE" "$ARCH" "$ALPINE_VERSION")" --no-same-owner -C "$MOUNT_POINT"
 
 cp "$(helpers-apkovl-filepath-get "$ARCH" "$ALPINE_VERSION" "$BUILD_HOSTNAME")" "$MOUNT_POINT"
+
+# cp "$DIR_BASE"/apk/apkovl/alpine.model.apkovl.tar.gz "$MOUNT_POINT"/
 
 dev-umount "$DEVICE_NAME"

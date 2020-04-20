@@ -118,8 +118,6 @@ apk-tools-install() {
     mkdir -p "$ROOTFS_DIR"/usr/local/sbin/
     cp "$DIR_APK_TOOLS"/../apk-tools-static/sbin/apk.static "$ROOTFS_DIR"/usr/local/sbin/
 
-    # cp /bin/qemu-aarch64-static "$ROOTFS_DIR"/usr/local/sbin/
-
     alpine_get_keys "$ROOTFS_DIR"
 
     einfo "installing apk tools in ""$ROOTFS_DIR"""
