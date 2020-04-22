@@ -58,8 +58,9 @@ EOF
 alpine_setup_install_essentials() {
     apk update
 
-    apk add \
-        openssh rsync sudo eudev haveged chrony avahi tzdata google-authenticator
+    apk add --no-cache \
+        openssh rsync sudo eudev haveged chrony avahi tzdata \
+        google-authenticator openssh-server-pam
 
 }
 
@@ -86,13 +87,24 @@ alpine_setup_initd() {
 
 alpine_setup_user() {
 
+    alpine_change_pass root
+
     /usr/sbin/addgroup -S maintenance
     /usr/sbin/adduser maintenance --ingroup maintenance --disabled-password
 
     mkdir -p /home/maintenance
 
+    alpine_change_pass maintenance
+
     # adding home to lbu
     lbu add /home/maintenance
+}
+
+alpine_change_pass() {
+    USER=$1
+    PASS="$(cat "$DIR_ALPINE_SETUP"/secrets/users/"$USER".password)"
+
+    echo "$USER":"$PASS" | /usr/sbin/chpasswd
 }
 
 #=============================== s s h ========================================#
@@ -118,6 +130,8 @@ EOF
     # setting up 2fa
     alpine_setup_ssh_2fa
 
+    # generate ssh keys - NOT WORKING YET
+    # alpine_generate_ssh_keys
 }
 
 alpine_setup_ssh_2fa() {
@@ -137,6 +151,14 @@ $GA_KEY
 " TOTP_AUTH
 
 EOF
+}
+
+alpine_generate_ssh_keys() {
+    SSH_KEY_PASSPHRASE="$(cat "$DIR_ALPINE_SETUP"/secrets/ssh/key.passphrase)"
+    for KEY_TYPE in "ed25519" "dsa" "ecdsa" "rsa"; do
+        echo "generating $KEY_TYPE ssh-keys"
+        ssh-keygen -q -o -a 100 -t "$KEY_TYPE" -f /etc/ssh/ssh_host_"$KEY_TYPE"_key -N "$SSH_KEY_PASSPHRASE"
+    done
 }
 
 #================================= w l a n ====================================#

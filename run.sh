@@ -79,6 +79,4 @@ tar xzf "$(helpers-hardware-filepath-get "$HARDWARE" "$ARCH" "$ALPINE_VERSION")"
 
 cp "$(helpers-apkovl-filepath-get "$ARCH" "$ALPINE_VERSION" "$BUILD_HOSTNAME")" "$MOUNT_POINT"
 
-# cp "$DIR_BASE"/apk/apkovl/alpine.model.apkovl.tar.gz "$MOUNT_POINT"/
-
 dev-umount "$DEVICE_NAME"

@@ -56,6 +56,20 @@ secrets-ssh-authorized_keys() {
     fi
 }
 
+secrets-ssh-key-passphrase() {
+    local SSH_KEY_PASSPHRASE
+
+    local -r FILE_DIR="$DIR_APK_TOOLS"/../secrets/ssh
+    local -r FILE_PATH="$FILE_DIR"/key.passphrase
+
+    if [ ! -f "$FILE_PATH" ]; then
+        mkdir -p "$FILE_DIR"
+        read -r -s -p "ssh key passphrase:" SSH_KEY_PASSPHRASE
+        echo "$SSH_KEY_PASSPHRASE" >"$FILE_PATH"
+        echo
+    fi
+}
+
 secrets-2fa() {
     local TWOFA
 
@@ -99,6 +113,7 @@ secrets() {
     secrets-user-root-password
     secrets-user-maintenance-password
     secrets-ssh-authorized_keys
+    secrets-ssh-key-passphrase
     secrets-2fa
     secrets-wlan
 }

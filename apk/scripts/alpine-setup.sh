@@ -45,5 +45,9 @@ alpine-setup() {
 
     chroot "$ROOTFS_DIRECTORY" /alpine-setup-local.sh "$BUILD_HOSTNAME" "$ALPINE_MIRROR" "$ALPINE_BRANCH" "$TIMEZONE"
 
+    # IMPORTANT CLEANUP - DO NOT ERASE EVEN THOUGH NOT IN THE LCCAL BACKUP
+    rm "$ROOTFS_DIRECTORY"/alpine-setup-local.sh
+    rm -rf "$ROOTFS_DIRECTORY"/secrets
+
     alpine-setup-apkovl-save "$ROOTFS_DIR" "$ARCH" "$ALPINE_VERSION" "$BUILD_HOSTNAME"
 }
