@@ -58,9 +58,8 @@ EOF
 alpine_setup_install_essentials() {
     apk update
 
-    apk add --no-cache \
-        openssh rsync sudo eudev haveged chrony avahi tzdata \
-        google-authenticator openssh-server-pam
+    apk add \
+        openssh rsync sudo eudev haveged chrony avahi dbus tzdata
 
 }
 
@@ -74,7 +73,7 @@ alpine_setup_initd() {
         rc-update add "$service" boot
     done
 
-    for service in haveged sshd chronyd local networking avahi-daemon; do
+    for service in dbus haveged sshd chronyd local networking avahi-daemon; do
         rc-update add "$service" default
     done
 
@@ -90,7 +89,7 @@ alpine_setup_user() {
     alpine_change_pass root
 
     /usr/sbin/addgroup -S maintenance
-    /usr/sbin/adduser maintenance --ingroup maintenance --disabled-password
+    /usr/sbin/adduser maintenance --ingroup maintenance --disabled-password --shell /bin/ash
 
     mkdir -p /home/maintenance
 
@@ -110,16 +109,15 @@ alpine_change_pass() {
 #=============================== s s h ========================================#
 
 alpine_setup_ssh() {
+
+    sed -i 's/#ChallengeResponseAuthentication yes/ChallengeResponseAuthentication yes/' /etc/ssh/sshd_config
+    sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin no/' /etc/ssh/sshd_config
+    sed -i 's/#LogLevel INFO/LogLevel INFO/' /etc/ssh/sshd_config
+
     cat <<EOF >>/etc/ssh/sshd_config
 
 AuthenticationMethods publickey,keyboard-interactive
-
 AllowUsers maintenance
-
-PermitRootLogin no
-PasswordAuthentication no
-
-ChallengeResponseAuthentication yes
 
 EOF
 
@@ -131,33 +129,35 @@ EOF
     alpine_setup_ssh_2fa
 
     # generate ssh keys - NOT WORKING YET
-    # alpine_generate_ssh_keys
+    alpine_generate_ssh_keys
 }
 
 alpine_setup_ssh_2fa() {
-    apk add openssh-server-pam google-authenticator
+    apk add --no-cache openssh-server-pam google-authenticator
 
     mkdir -p /etc/pam.d
     echo "auth required pam_google_authenticator.so" >/etc/pam.d/sshd
 
-    printf "\nUsePAM yes\n" >>/etc/ssh/sshd_config
+    sed -i 's/#UsePAM no/UsePAM yes/' /etc/ssh/sshd_config
 
     GA_KEY="$(cat "$DIR_ALPINE_SETUP"/secrets/2fa/google_authenticator)"
 
     cat <<EOF >>/home/maintenance/.google_authenticator
 $GA_KEY
 " RATE_LIMIT 3 30
-    " WINDOW_SIZE 17
+" WINDOW_SIZE 17
 " TOTP_AUTH
 
 EOF
+
+    chown maintenance:maintenance /home/maintenance/.google_authenticator
+    chmod 0600 /home/maintenance/.google_authenticator
 }
 
 alpine_generate_ssh_keys() {
-    SSH_KEY_PASSPHRASE="$(cat "$DIR_ALPINE_SETUP"/secrets/ssh/key.passphrase)"
     for KEY_TYPE in "ed25519" "dsa" "ecdsa" "rsa"; do
         echo "generating $KEY_TYPE ssh-keys"
-        ssh-keygen -q -o -a 100 -t "$KEY_TYPE" -f /etc/ssh/ssh_host_"$KEY_TYPE"_key -N "$SSH_KEY_PASSPHRASE"
+        ssh-keygen -q -o -a 100 -t "$KEY_TYPE" -f /etc/ssh/ssh_host_"$KEY_TYPE"_key -N ""
     done
 }
 
@@ -165,19 +165,16 @@ alpine_generate_ssh_keys() {
 
 alpine_setup_wlan() {
     SSID="$(cat "$DIR_ALPINE_SETUP"/secrets/wlan/ssid)"
-    PSK="$(cat "$DIR_ALPINE_SETUP"/secrets/wlan/psk)"
+    PASSWORD="$(cat "$DIR_ALPINE_SETUP"/secrets/wlan/password)"
 
     apk add wpa_supplicant
 
     rc-update add wpa_supplicant default
 
-    cat <<EOF >>/etc/wpa_supplicant/wpa_supplicant.conf
-network={
-	ssid="$SSID"
-	key_mgmt=WPA-PSK
-	psk=$PSK
-}
-EOF
+    wpa_passphrase "$SSID" "$PASSWORD" >/etc/wpa_supplicant/wpa_supplicant.conf
+
+    # remove the clear password...
+    sed -i '/^[[:blank:]]*#/d;s/#.*//' /etc/wpa_supplicant/wpa_supplicant.conf
 
     cat <<EOF >>/etc/network/interfaces
 auto wlan0
@@ -190,6 +187,9 @@ EOF
 #=================================== l b u ====================================#
 
 alpine_setup_lbu_commit() {
+    # In order to have apks right away
+    setup-apkcache /etc/apk/cache
+    apk cache -v sync
     lbu pkg "$DIR_ALPINE_SETUP"/alpine.apkovl.tar.gz
 }
 

@@ -50,6 +50,8 @@ if [ -z "$BUILD_HOSTNAME" ]; then
     die "you need to give a hostname as an argument: -n HOSTNAME"
 fi
 
+einfo "creating the local backup file (apkovl)"
+
 secrets
 
 # rootfs dir

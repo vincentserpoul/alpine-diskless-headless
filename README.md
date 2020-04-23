@@ -2,6 +2,8 @@ WIP
 
 # TODO
 
+- [ ] fix apk-cache issue
+- [ ] try to encrypt lbu
 - [ ] encrypt secrets (using [age](https://github.com/FiloSottile/age)?)
 - [ ] [ufw](https://wiki.alpinelinux.org/wiki/Uncomplicated_Firewall)
 

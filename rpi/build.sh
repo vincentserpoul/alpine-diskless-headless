@@ -39,4 +39,6 @@ done
 
 # root-check
 
+einfo "Getting the necessary files for the RPi to boot with alpine"
+
 alpine-download "$ARCH" "$ALPINE_MIRROR" "$ALPINE_BRANCH" "$ALPINE_VERSION"
