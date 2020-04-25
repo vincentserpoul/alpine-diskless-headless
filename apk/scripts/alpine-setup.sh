@@ -12,6 +12,23 @@ if [[ ! -d "$DIR_ALPINE_SETUP" ]]; then DIR_ALPINE_SETUP="$PWD"; fi
 . """$DIR_ALPINE_SETUP""/../../scripts/utils.sh"
 . """$DIR_ALPINE_SETUP""/../../scripts/helpers.sh"
 
+#============================= a p k  c a c h e ===============================#
+
+alpine-setup-apkcache-save() {
+    local -r ROOTFS_DIR=$1
+    local -r ARCH=$2
+    local -r ALPINE_VERSION=$3
+    local -r BUILD_HOSTNAME=$4
+
+    einfo "backing up apk cache outside of rootfs"
+
+    mkdir -p "$DIR_ALPINE_SETUP"/../apkovl
+
+    chroot "$ROOTFS_DIR" tar czf /alpine.apkcache.tar.gz /var/cache/apk
+
+    mv "$ROOTFS_DIR"/alpine.apkcache.tar.gz "$(helpers-apkcache-filepath-get "$ARCH" "$ALPINE_VERSION" "$BUILD_HOSTNAME")"
+}
+
 #=================================== l b u ====================================#
 
 alpine-setup-apkovl-save() {
@@ -49,5 +66,6 @@ alpine-setup() {
     rm "$ROOTFS_DIRECTORY"/alpine-setup-local.sh
     rm -rf "$ROOTFS_DIRECTORY"/secrets
 
+    alpine-setup-apkcache-save "$ROOTFS_DIR" "$ARCH" "$ALPINE_VERSION" "$BUILD_HOSTNAME"
     alpine-setup-apkovl-save "$ROOTFS_DIR" "$ARCH" "$ALPINE_VERSION" "$BUILD_HOSTNAME"
 }

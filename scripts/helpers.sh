@@ -34,3 +34,11 @@ helpers-apkovl-filepath-get() {
 
     echo "$DIR_HELPERS"/../apk/apkovl/alpine-"$ALPINE_VERSION"-"$ARCH"-"$BUILD_HOSTNAME".apkovl.tar.gz
 }
+
+helpers-apkcache-filepath-get() {
+    local -r ARCH=$1
+    local -r ALPINE_VERSION=$2
+    local -r BUILD_HOSTNAME=$3
+
+    echo "$DIR_HELPERS"/../apk/apkovl/alpine-"$ALPINE_VERSION"-"$ARCH"-"$BUILD_HOSTNAME".apkcache.tar.gz
+}

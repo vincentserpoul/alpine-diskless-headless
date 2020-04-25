@@ -25,22 +25,12 @@ dev-partition-full() {
         mkfs.ext4 -F "$DEVICE_NAME"2
 }
 
-dev-partition() {
-    local -r DEVICE_NAME=$1
-
-    parted -a optimal -s "$DEVICE_NAME" \
-        mklabel msdos \
-        mkpart primary fat32 0% 256MiB \
-        set 1 boot on &&
-        mkfs.vfat -F 32 "$DEVICE_NAME"1
-}
-
-dev-mount() {
+dev-boot-mount() {
     local DEVICE_NAME=$1
 
-    einfo "mounting partition ""$DEVICE_NAME""1"
+    einfo "mounting boot partition ""$DEVICE_NAME""1"
 
-    local -r MOUNTING_POINT="$DIR_DEVICE"/../mnt
+    local -r MOUNTING_POINT="$DIR_DEVICE"/../mnt/boot
 
     mkdir -p "$MOUNTING_POINT"
     mount --make-private "$DEVICE_NAME"1 "$MOUNTING_POINT" || true
@@ -48,12 +38,33 @@ dev-mount() {
     echo "$MOUNTING_POINT"
 }
 
-dev-umount() {
+dev-boot-umount() {
     local DEVICE_NAME=$1
 
-    einfo "unmounting partition ""$DEVICE_NAME""1"
+    einfo "unmounting boot partition ""$DEVICE_NAME""1"
 
     umount "$DEVICE_NAME"1 --lazy || true
+}
+
+dev-disk-mount() {
+    local DEVICE_NAME=$1
+
+    einfo "mounting disc partition ""$DEVICE_NAME""2"
+
+    local -r MOUNTING_POINT="$DIR_DEVICE"/../mnt/disk
+
+    mkdir -p "$MOUNTING_POINT"
+    mount --make-private "$DEVICE_NAME"2 "$MOUNTING_POINT" || true
+
+    echo "$MOUNTING_POINT"
+}
+
+dev-disk-umount() {
+    local DEVICE_NAME=$1
+
+    einfo "unmounting disc partition ""$DEVICE_NAME""2"
+
+    umount "$DEVICE_NAME"2 --lazy || true
 }
 
 dep-check parted

@@ -71,12 +71,15 @@ if [ "$FORCE" == false ]; then
 	fi
 fi
 
-dev-partition "$DEVICE_NAME"
+dev-partition-full "$DEVICE_NAME"
 
-readonly MOUNT_POINT="$(dev-mount "$DEVICE_NAME")"
+readonly BOOT_MOUNT_POINT="$(dev-boot-mount "$DEVICE_NAME")"
+einfo "copying boot files and local backup to boot partition"
+tar xzf "$(helpers-hardware-filepath-get "$HARDWARE" "$ARCH" "$ALPINE_VERSION")" --no-same-owner -C "$BOOT_MOUNT_POINT"
+cp "$(helpers-apkovl-filepath-get "$ARCH" "$ALPINE_VERSION" "$BUILD_HOSTNAME")" "$BOOT_MOUNT_POINT"
+dev-boot-umount "$DEVICE_NAME"
 
-tar xzf "$(helpers-hardware-filepath-get "$HARDWARE" "$ARCH" "$ALPINE_VERSION")" --no-same-owner -C "$MOUNT_POINT"
-
-cp "$(helpers-apkovl-filepath-get "$ARCH" "$ALPINE_VERSION" "$BUILD_HOSTNAME")" "$MOUNT_POINT"
-
-dev-umount "$DEVICE_NAME"
+readonly DISK_MOUNT_POINT="$(dev-disk-mount "$DEVICE_NAME")"
+einfo "extracting apk cache to main ext4 partition"
+tar xzf "$(helpers-apkcache-filepath-get "$ARCH" "$ALPINE_VERSION" "$BUILD_HOSTNAME")" --no-same-owner -C "$DISK_MOUNT_POINT"
+dev-disk-umount "$DEVICE_NAME"

@@ -133,7 +133,7 @@ EOF
 }
 
 alpine_setup_ssh_2fa() {
-    apk add --no-cache openssh-server-pam google-authenticator
+    apk add openssh-server-pam google-authenticator
 
     mkdir -p /etc/pam.d
     echo "auth required pam_google_authenticator.so" >/etc/pam.d/sshd
@@ -183,13 +183,27 @@ iface wlan0 inet dhcp
 
 EOF
 }
+#============================= a p k  c a c h e ===============================#
+
+alpine_setup_apkcache_config() {
+    ln -s /var/cache/apk /etc/apk/cache
+}
+
+alpine_setup_apkcache_sync() {
+    # fetching all deps in the apk cache
+    apk cache -v sync
+
+    # move the cache var to where it will be mounted
+    rm /etc/apk/cache
+    ln -s /media/mmcblk0p2/var/cache/apk /etc/apk/cache
+
+    # adding the first ext4 partition to the fstab, to have the var cache at startup
+    echo "/dev/mmcblk0p2 /media/mmcblk0p2 ext4 rw,relatime 0 0" >>/etc/fstab
+}
 
 #=================================== l b u ====================================#
 
 alpine_setup_lbu_commit() {
-    # In order to have apks right away
-    setup-apkcache /etc/apk/cache
-    apk cache -v sync
     lbu pkg "$DIR_ALPINE_SETUP"/alpine.apkovl.tar.gz
 }
 
@@ -205,6 +219,7 @@ TIMEZONE=$4
 mkdir -p /etc
 printf 'nameserver 8.8.8.8\nnameserver 2620:0:ccc::2' >/etc/resolv.conf
 
+alpine_setup_apkcache_config
 alpine_setup_hostname "$BUILD_HOSTNAME"
 alpine_setup_repositories "$ALPINE_MIRROR" "$ALPINE_BRANCH"
 alpine_setup_dns
@@ -217,4 +232,5 @@ alpine_setup_user
 alpine_setup_ssh
 alpine_setup_wlan
 
+alpine_setup_apkcache_sync
 alpine_setup_lbu_commit
