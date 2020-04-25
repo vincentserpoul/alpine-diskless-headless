@@ -12,7 +12,7 @@ DIR_BASE="${BASH_SOURCE%/*}"
 if [[ ! -d "$DIR_BASE" ]]; then DIR_BASE="$PWD"; fi
 
 . """$DIR_BASE""/scripts/utils.sh"
-. """$DIR_BASE""/scripts/defaults.sh"
+
 . """$DIR_BASE""/scripts/helpers.sh"
 . """$DIR_BASE""/scripts/dev.sh"
 
@@ -42,6 +42,9 @@ done
 
 root-check
 helpers-build-hostname-check
+
+# Set default values
+. """$DIR_BASE""/scripts/defaults.sh"
 
 einfo "running alpine-diskless-headless-build"
 
@@ -81,5 +84,6 @@ dev-boot-umount "$DEVICE_NAME"
 
 readonly DISK_MOUNT_POINT="$(dev-disk-mount "$DEVICE_NAME")"
 einfo "extracting apk cache to main ext4 partition"
-tar xzf "$(helpers-apkcache-filepath-get "$ARCH" "$ALPINE_VERSION" "$BUILD_HOSTNAME")" --no-same-owner -C "$DISK_MOUNT_POINT"
+mkdir -p "$DISK_MOUNT_POINT"/var/cache/apk
+tar xzf "$(helpers-apkcache-filepath-get "$ARCH" "$ALPINE_VERSION" "$BUILD_HOSTNAME")" -C "$DISK_MOUNT_POINT"/var/cache/apk
 dev-disk-umount "$DEVICE_NAME"

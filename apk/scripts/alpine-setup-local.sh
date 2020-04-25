@@ -63,13 +63,33 @@ alpine_setup_install_essentials() {
 
 }
 
+alpine_setup_reinstall_pkg_boot() {
+    cat <<EOF >/etc/init.d/reinstall-pkg
+#!/sbin/openrc-run
+
+description="Install necessary packages at boot"
+
+depend() {
+  after modules
+  need localmount
+}
+
+start() {
+    /sbin/apk fix
+}
+EOF
+
+    chmod +x /etc/init.d/reinstall-pkg
+    lbu include /etc/init.d/reinstall-pkg
+}
+
 alpine_setup_initd() {
 
     for service in devfs dmesg mdev hwdrivers modloop; do
         rc-update add "$service" sysinit
     done
 
-    for service in modules sysctl hostname bootmisc swclock syslog swap; do
+    for service in modules sysctl hostname bootmisc swclock syslog swap reinstall-pkg; do
         rc-update add "$service" boot
     done
 
@@ -223,10 +243,11 @@ alpine_setup_apkcache_config
 alpine_setup_hostname "$BUILD_HOSTNAME"
 alpine_setup_repositories "$ALPINE_MIRROR" "$ALPINE_BRANCH"
 alpine_setup_dns
+alpine_setup_install_essentials
 alpine_setup_keymap
 alpine_setup_timezone "$TIMEZONE"
 alpine_setup_networking
-alpine_setup_install_essentials
+alpine_setup_reinstall_pkg_boot
 alpine_setup_initd
 alpine_setup_user
 alpine_setup_ssh

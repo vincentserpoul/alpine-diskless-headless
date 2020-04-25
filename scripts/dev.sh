@@ -49,7 +49,7 @@ dev-boot-umount() {
 dev-disk-mount() {
     local DEVICE_NAME=$1
 
-    einfo "mounting disc partition ""$DEVICE_NAME""2"
+    einfo "mounting disk partition ""$DEVICE_NAME""2"
 
     local -r MOUNTING_POINT="$DIR_DEVICE"/../mnt/disk
 
@@ -62,7 +62,7 @@ dev-disk-mount() {
 dev-disk-umount() {
     local DEVICE_NAME=$1
 
-    einfo "unmounting disc partition ""$DEVICE_NAME""2"
+    einfo "unmounting disk partition ""$DEVICE_NAME""2"
 
     umount "$DEVICE_NAME"2 --lazy || true
 }

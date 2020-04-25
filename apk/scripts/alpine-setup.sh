@@ -24,9 +24,10 @@ alpine-setup-apkcache-save() {
 
     mkdir -p "$DIR_ALPINE_SETUP"/../apkovl
 
-    chroot "$ROOTFS_DIR" tar czf /alpine.apkcache.tar.gz /var/cache/apk
-
-    mv "$ROOTFS_DIR"/alpine.apkcache.tar.gz "$(helpers-apkcache-filepath-get "$ARCH" "$ALPINE_VERSION" "$BUILD_HOSTNAME")"
+    tar czf \
+        "$(helpers-apkcache-filepath-get "$ARCH" "$ALPINE_VERSION" "$BUILD_HOSTNAME")" \
+        -C "$ROOTFS_DIR"/var/cache/apk \
+        .
 }
 
 #=================================== l b u ====================================#
@@ -40,8 +41,8 @@ alpine-setup-apkovl-save() {
     einfo "backing up apkovl outside of rootfs"
 
     mkdir -p "$DIR_ALPINE_SETUP"/../apkovl
-
-    mv "$ROOTFS_DIR"/alpine.apkovl.tar.gz "$(helpers-apkovl-filepath-get "$ARCH" "$ALPINE_VERSION" "$BUILD_HOSTNAME")"
+    mv "$ROOTFS_DIR"/alpine.apkovl.tar.gz \
+        "$(helpers-apkovl-filepath-get "$ARCH" "$ALPINE_VERSION" "$BUILD_HOSTNAME")"
 }
 
 #==============================================================================#
@@ -54,13 +55,14 @@ alpine-setup() {
     local -r BUILD_HOSTNAME=$3
     local -r ALPINE_MIRROR=$4
     local -r ALPINE_BRANCH=$5
-    local -r TIMEZONE=$6
-    local -r ALPINE_VERSION=$7
+    local -r ALPINE_VERSION=$6
+    local -r TIMEZONE=$7
 
     cp "$BUILD_DIR"/scripts/alpine-setup-local.sh "$ROOTFS_DIRECTORY"/
     cp -r "$BUILD_DIR"/secrets "$ROOTFS_DIRECTORY"/
 
-    chroot "$ROOTFS_DIRECTORY" /alpine-setup-local.sh "$BUILD_HOSTNAME" "$ALPINE_MIRROR" "$ALPINE_BRANCH" "$TIMEZONE"
+    chroot "$ROOTFS_DIRECTORY" \
+        /alpine-setup-local.sh "$BUILD_HOSTNAME" "$ALPINE_MIRROR" "$ALPINE_BRANCH" "$TIMEZONE"
 
     # IMPORTANT CLEANUP - DO NOT ERASE EVEN THOUGH NOT IN THE LCCAL BACKUP
     rm "$ROOTFS_DIRECTORY"/alpine-setup-local.sh

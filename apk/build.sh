@@ -12,7 +12,6 @@ BUILD_DIR="${BASH_SOURCE%/*}"
 if [[ ! -d "$BUILD_DIR" ]]; then BUILD_DIR="$PWD"; fi
 
 . """$BUILD_DIR""/../scripts/utils.sh"
-. """$BUILD_DIR""/../scripts/defaults.sh"
 . """$BUILD_DIR""/../scripts/helpers.sh"
 . """$BUILD_DIR""/scripts/secrets.sh"
 . """$BUILD_DIR""/scripts/apk-tools.sh"
@@ -45,6 +44,9 @@ done
 root-check
 helpers-build-hostname-check
 
+# Set default values
+. """$BUILD_DIR""/../scripts/defaults.sh"
+
 # Check if build hostname is empty
 if [ -z "$BUILD_HOSTNAME" ]; then
     die "you need to give a hostname as an argument: -n HOSTNAME"
@@ -66,7 +68,7 @@ apk-tools-mount-rootfs-dir-all "$ROOTFS_DIRECTORY"
 
 apk-tools-install "$ROOTFS_DIRECTORY" "$ARCH" "$ALPINE_MIRROR" "$ALPINE_BRANCH"
 
-alpine-setup "$ROOTFS_DIRECTORY" "$ARCH" "$BUILD_HOSTNAME" "$ALPINE_MIRROR" "$ALPINE_BRANCH" "$TIMEZONE" "$ALPINE_VERSION"
+alpine-setup "$ROOTFS_DIRECTORY" "$ARCH" "$BUILD_HOSTNAME" "$ALPINE_MIRROR" "$ALPINE_BRANCH" "$ALPINE_VERSION" "$TIMEZONE"
 
 apk-tools-umount-rootfs-dir-all "$ROOTFS_DIRECTORY"
 
