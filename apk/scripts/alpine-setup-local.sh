@@ -191,7 +191,7 @@ alpine_setup_apkcache_config() {
 
 alpine_setup_apkcache_sync() {
     # fetching all deps in the apk cache
-    apk cache -v sync
+    apk cache sync
 
     # move the cache var to where it will be mounted
     rm /etc/apk/cache
