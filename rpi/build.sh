@@ -14,6 +14,7 @@ if [[ ! -d "$BUILD_DIR" ]]; then BUILD_DIR="$PWD"; fi
 . """$BUILD_DIR""/../scripts/utils.sh"
 . """$BUILD_DIR""/../scripts/defaults.sh"
 . """$BUILD_DIR""/scripts/alpine.sh"
+. """$BUILD_DIR""/scripts/boot.sh"
 
 #===================================  M a i n  ================================#
 
@@ -42,3 +43,7 @@ done
 einfo "Getting the necessary files for the RPi to boot with alpine"
 
 alpine-download "$ARCH" "$ALPINE_MIRROR" "$ALPINE_BRANCH" "$ALPINE_VERSION"
+
+alpine-extract "$ARCH" "$ALPINE_VERSION"
+
+boot-update "$ARCH" "$ALPINE_VERSION"
