@@ -68,7 +68,7 @@ apk-tools-downloadx() {
 
     local -r FILE_NAME="$(apk-tools-latest-version-get "$LIST_URL")"
 
-    local -r FILE_PATH="""$FILE_DIR""/""$FILE_NAME"""
+    local -r FILE_PATH="""$FILE_DIR""/""$ARCH""-""$FILE_NAME"""
 
     einfo "dowloading apk static tools"
 
