@@ -52,7 +52,5 @@ alpine-extract() {
     local -r WORK_DIR="$(helpers-workdir-name-get """$ARCH""" """$ALPINE_VERSION""")"
     mkdir -p "$WORK_DIR"
 
-    echo "$FILE_PATH"
-
     tar xzf "$FILE_PATH" -C "$WORK_DIR"
 }
