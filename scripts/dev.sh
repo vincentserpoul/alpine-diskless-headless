@@ -9,6 +9,7 @@ set -euo pipefail
 DIR_DEVICE="${BASH_SOURCE%/*}"
 if [[ ! -d "$DIR_DEVICE" ]]; then DIR_DEVICE="$PWD"; fi
 
+# shellcheck source=/dev/null
 . """$DIR_DEVICE""/utils.sh"
 
 #=============================== s d c a r d ==================================#

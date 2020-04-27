@@ -9,7 +9,9 @@ set -euo pipefail
 DIR_ALPINE_SETUP="${BASH_SOURCE%/*}"
 if [[ ! -d "$DIR_ALPINE_SETUP" ]]; then DIR_ALPINE_SETUP="$PWD"; fi
 
+# shellcheck source=/dev/null
 . """$DIR_ALPINE_SETUP""/../../scripts/utils.sh"
+# shellcheck source=/dev/null
 . """$DIR_ALPINE_SETUP""/../../scripts/helpers.sh"
 
 #============================= a p k  c a c h e ===============================#

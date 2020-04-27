@@ -11,10 +11,15 @@ readonly VERSION="1.0.0"
 BUILD_DIR="${BASH_SOURCE%/*}"
 if [[ ! -d "$BUILD_DIR" ]]; then BUILD_DIR="$PWD"; fi
 
+# shellcheck source=/dev/null
 . """$BUILD_DIR""/../scripts/utils.sh"
+# shellcheck source=/dev/null
 . """$BUILD_DIR""/../scripts/helpers.sh"
+# shellcheck source=/dev/null
 . """$BUILD_DIR""/scripts/secrets.sh"
+# shellcheck source=/dev/null
 . """$BUILD_DIR""/scripts/apk-tools.sh"
+# shellcheck source=/dev/null
 . """$BUILD_DIR""/scripts/alpine-setup.sh"
 
 #===================================  M a i n  ================================#
@@ -45,6 +50,7 @@ root-check
 helpers-build-hostname-check
 
 # Set default values
+# shellcheck source=/dev/null
 . """$BUILD_DIR""/../scripts/defaults.sh"
 
 # Check if build hostname is empty

@@ -62,9 +62,12 @@ readonly VERSION="1.0.0"
 DIR_BASE="${BASH_SOURCE%/*}"
 if [[ ! -d "$DIR_BASE" ]]; then DIR_BASE="$PWD"; fi
 
+# shellcheck source=/dev/null
 . """$DIR_BASE""/scripts/utils.sh"
 
+# shellcheck source=/dev/null
 . """$DIR_BASE""/scripts/helpers.sh"
+# shellcheck source=/dev/null
 . """$DIR_BASE""/scripts/dev.sh"
 
 #================================= m a i n ====================================#
@@ -96,6 +99,7 @@ root-check
 helpers-build-hostname-check
 
 # Set default values
+# shellcheck source=/dev/null
 . """$DIR_BASE""/scripts/defaults.sh"
 
 einfo "running alpine-diskless-headless-run"

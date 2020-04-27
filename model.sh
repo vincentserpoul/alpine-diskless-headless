@@ -7,9 +7,13 @@ set -euo pipefail
 DIR_BASE="${BASH_SOURCE%/*}"
 if [[ ! -d "$DIR_BASE" ]]; then DIR_BASE="$PWD"; fi
 
+# shellcheck source=/dev/null
 . """$DIR_BASE""/scripts/utils.sh"
+# shellcheck source=/dev/null
 . """$DIR_BASE""/scripts/defaults.sh"
+# shellcheck source=/dev/null
 . """$DIR_BASE""/scripts/helpers.sh"
+# shellcheck source=/dev/null
 . """$DIR_BASE""/scripts/dev.sh"
 
 mkdir -p /mnt/sda2

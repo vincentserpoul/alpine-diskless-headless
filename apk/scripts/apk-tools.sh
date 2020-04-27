@@ -9,6 +9,7 @@ set -euo pipefail
 DIR_APK_TOOLS="${BASH_SOURCE%/*}"
 if [[ ! -d "$DIR_APK_TOOLS" ]]; then DIR_APK_TOOLS="$PWD"; fi
 
+# shellcheck source=/dev/null
 . """$DIR_APK_TOOLS""/../../scripts/utils.sh"
 
 #==============================================================================#

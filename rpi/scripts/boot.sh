@@ -9,8 +9,11 @@ set -euo pipefail
 DIR_BOOT="${BASH_SOURCE%/*}"
 if [[ ! -d "$DIR_BOOT" ]]; then DIR_BOOT="$PWD"; fi
 
+# shellcheck source=/dev/null
 . """$DIR_ALPINE""/helpers.sh"
+# shellcheck source=/dev/null
 . """$DIR_BOOT""/../../scripts/utils.sh"
+# shellcheck source=/dev/null
 . """$DIR_ALPINE""/../../scripts/helpers.sh"
 
 #================================  b o o t  ===================================#

@@ -9,6 +9,7 @@ set -euo pipefail
 DIR_HELPERS="${BASH_SOURCE%/*}"
 if [[ ! -d "$DIR_HELPERS" ]]; then DIR_HELPERS="$PWD"; fi
 
+# shellcheck source=/dev/null
 . """$DIR_HELPERS""/utils.sh"
 
 #==============================================================================#

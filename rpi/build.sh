@@ -11,9 +11,13 @@ readonly VERSION="1.0.0"
 BUILD_DIR="${BASH_SOURCE%/*}"
 if [[ ! -d "$BUILD_DIR" ]]; then BUILD_DIR="$PWD"; fi
 
+# shellcheck source=/dev/null
 . """$BUILD_DIR""/../scripts/utils.sh"
+# shellcheck source=/dev/null
 . """$BUILD_DIR""/../scripts/defaults.sh"
+# shellcheck source=/dev/null
 . """$BUILD_DIR""/scripts/alpine.sh"
+# shellcheck source=/dev/null
 . """$BUILD_DIR""/scripts/boot.sh"
 
 #===================================  M a i n  ================================#

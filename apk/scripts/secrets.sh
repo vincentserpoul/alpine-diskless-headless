@@ -9,6 +9,7 @@ set -euo pipefail
 DIR_SECRETS="${BASH_SOURCE%/*}"
 if [[ ! -d "$DIR_SECRETS" ]]; then DIR_SECRETS="$PWD"; fi
 
+# shellcheck source=/dev/null
 . """$DIR_SECRETS""/../../scripts/utils.sh"
 
 #================================= s e c r e t s ==============================#
