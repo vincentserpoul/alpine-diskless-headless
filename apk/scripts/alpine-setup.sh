@@ -59,12 +59,13 @@ alpine-setup() {
     local -r ALPINE_BRANCH=$5
     local -r ALPINE_VERSION=$6
     local -r TIMEZONE=$7
+    local -r NETWORKING=$8
 
     cp "$BUILD_DIR"/scripts/alpine-setup-local.sh "$ROOTFS_DIRECTORY"/
     cp -r "$BUILD_DIR"/secrets "$ROOTFS_DIRECTORY"/
 
     chroot "$ROOTFS_DIRECTORY" \
-        /alpine-setup-local.sh "$BUILD_HOSTNAME" "$ALPINE_MIRROR" "$ALPINE_BRANCH" "$TIMEZONE"
+        /alpine-setup-local.sh "$BUILD_HOSTNAME" "$ALPINE_MIRROR" "$ALPINE_BRANCH" "$TIMEZONE" "$NETWORKING"
 
     # IMPORTANT CLEANUP - DO NOT ERASE EVEN THOUGH NOT IN THE LCCAL BACKUP
     rm "$ROOTFS_DIRECTORY"/alpine-setup-local.sh

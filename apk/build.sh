@@ -25,7 +25,7 @@ if [[ ! -d "$BUILD_DIR" ]]; then BUILD_DIR="$PWD"; fi
 #===================================  M a i n  ================================#
 
 #===================================  M e n u  ================================#
-while getopts 'a:b:v:m:n:t:h' OPTION; do
+while getopts 'a:b:v:m:n:t:w:h' OPTION; do
     case "$OPTION" in
     a) ARCH="$OPTARG" ;;
     m) ALPINE_MIRROR="$OPTARG" ;;
@@ -33,6 +33,7 @@ while getopts 'a:b:v:m:n:t:h' OPTION; do
     v) ALPINE_VERSION="$OPTARG" ;;
     n) BUILD_HOSTNAME="$OPTARG" ;;
     t) TIMEZONE="$OPTARG" ;;
+    w) NETWORKING="$OPTARG" ;;
     h)
         echo "alpine-diskless-headless-apk-build v""$VERSION"""
         exit 0
@@ -74,7 +75,7 @@ apk-tools-mount-rootfs-dir-all "$ROOTFS_DIRECTORY"
 
 apk-tools-install "$ROOTFS_DIRECTORY" "$ARCH" "$ALPINE_MIRROR" "$ALPINE_BRANCH"
 
-alpine-setup "$ROOTFS_DIRECTORY" "$ARCH" "$BUILD_HOSTNAME" "$ALPINE_MIRROR" "$ALPINE_BRANCH" "$ALPINE_VERSION" "$TIMEZONE"
+alpine-setup "$ROOTFS_DIRECTORY" "$ARCH" "$BUILD_HOSTNAME" "$ALPINE_MIRROR" "$ALPINE_BRANCH" "$ALPINE_VERSION" "$TIMEZONE" "$NETWORKING"
 
 apk-tools-umount-rootfs-dir-all "$ROOTFS_DIRECTORY"
 

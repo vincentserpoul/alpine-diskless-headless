@@ -48,10 +48,6 @@ alpine_setup_networking() {
 auto lo
 iface lo inet loopback
 
-auto eth0
-iface eth0 inet dhcp
-    hostname $BUILD_HOSTNAME
-
 EOF
 }
 
@@ -115,6 +111,8 @@ alpine_setup_user() {
 
     alpine_change_pass maintenance
 
+    alpine_sudoers maintenance
+
     # adding home to lbu
     lbu add /home/maintenance
 }
@@ -126,6 +124,11 @@ alpine_change_pass() {
     echo "$USER":"$PASS" | /usr/sbin/chpasswd
 }
 
+alpine_sudoers() {
+    GROUP=$1
+    echo "%""$GROUP"" ALL=(ALL) ALL" >/etc/sudoers.d/maintenance
+}
+
 #=============================== s s h ========================================#
 
 alpine_setup_ssh() {
@@ -133,6 +136,8 @@ alpine_setup_ssh() {
     sed -i 's/#ChallengeResponseAuthentication yes/ChallengeResponseAuthentication yes/' /etc/ssh/sshd_config
     sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin no/' /etc/ssh/sshd_config
     sed -i 's/#LogLevel INFO/LogLevel INFO/' /etc/ssh/sshd_config
+    sed -i 's/#ListenAddress ::/ListenAddress ::/' /etc/ssh/sshd_config
+    sed -i 's/#ListenAddress 0.0.0.0/ListenAddress 0.0.0.0/' /etc/ssh/sshd_config
 
     cat <<EOF >>/etc/ssh/sshd_config
 
@@ -181,14 +186,25 @@ alpine_generate_ssh_keys() {
     done
 }
 
-#================================= w l a n ====================================#
+#============================  n e t w o r k i n g  ===========================#
+
+alpine_setup_eth() {
+    BUILD_HOSTNAME=$1
+    cat <<EOF >>/etc/network/interfaces
+
+auto eth0
+iface eth0 inet dhcp
+    hostname $BUILD_HOSTNAME
+
+EOF
+}
 
 alpine_setup_wlan() {
+    BUILD_HOSTNAME=$1
     SSID="$(cat "$DIR_ALPINE_SETUP"/secrets/wlan/ssid)"
     PASSWORD="$(cat "$DIR_ALPINE_SETUP"/secrets/wlan/password)"
 
     apk add wpa_supplicant
-
     rc-update add wpa_supplicant default
 
     wpa_passphrase "$SSID" "$PASSWORD" >/etc/wpa_supplicant/wpa_supplicant.conf
@@ -203,6 +219,7 @@ iface wlan0 inet dhcp
 
 EOF
 }
+
 #============================= a p k  c a c h e ===============================#
 
 alpine_setup_apkcache_config() {
@@ -235,6 +252,7 @@ BUILD_HOSTNAME=$1
 ALPINE_MIRROR=$2
 ALPINE_BRANCH=$3
 TIMEZONE=$4
+NETWORKING=$5
 
 mkdir -p /etc
 printf 'nameserver 8.8.8.8\nnameserver 2620:0:ccc::2' >/etc/resolv.conf
@@ -251,7 +269,14 @@ alpine_setup_reinstall_pkg_boot
 alpine_setup_initd
 alpine_setup_user
 alpine_setup_ssh
-alpine_setup_wlan
+
+# Check ../../../scripts/defaults for the different values
+if test "$NETWORKING" = 1 || test "$NETWORKING" = 3; then
+    alpine_setup_eth "$BUILD_HOSTNAME"
+fi
+if test "$NETWORKING" = 2 || test "$NETWORKING" = 3; then
+    alpine_setup_wlan "$BUILD_HOSTNAME"
+fi
 
 alpine_setup_apkcache_sync
 alpine_setup_lbu_commit

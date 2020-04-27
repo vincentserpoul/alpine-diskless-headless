@@ -43,6 +43,10 @@ These scripts will help you build and write a headless install of alpine linux f
 #   -t TIMEZONE            Timezone.
 #                          Default: Asia/Singapore
 #
+#   -w NETWORKING          Networking options
+#                          Options: 0 (NONE), 1 (ETHERNET), 2 (WLAN), 3 (ALL)
+#                          Default: 3
+#
 #   -f FORCE               If true, don't ask before writing to the device.
 #                          Default: false
 #
@@ -55,9 +59,25 @@ These scripts will help you build and write a headless install of alpine linux f
 # https://github.com/vincentserpoul/alpine-diskless-headless
 ```
 
+# Examples
+
+You have a rpi3B+, hostname test-magic, and you want ethernet and wlan
+
+```bash
+sudo ./run.sh -n test-magictest-magic
+```
+
+You have a rpi0, hostname test-magic, and you only need wlan (armhf and no ethernet on rpi0)
+
+```bash
+sudo ./run.sh -n test-magictest-magic -a armhf -w 2
+```
+
 # TODO
 
+- [ ] fix wlan dhcp
 - [ ] encrypt lbu
+- [ ] switch to rust or go cli
 - [ ] encrypt secrets (using [age](https://github.com/FiloSottile/age)?)
 - [ ] [ufw](https://wiki.alpinelinux.org/wiki/Uncomplicated_Firewall)
 
@@ -67,3 +87,7 @@ These scripts will help you build and write a headless install of alpine linux f
 - https://github.com/knoopx/alpine-raspberry-pi
 - https://github.com/yangxuan8282/gen-rpi_os/blob/master/gen-alpine_rpi.sh
 - https://hütter.ch/posts/pitaya-alpine/#preparations
+
+```
+
+```

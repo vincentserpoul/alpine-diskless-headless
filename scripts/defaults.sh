@@ -4,6 +4,11 @@ set -euo pipefail
 
 #==============================================================================#
 
+export readonly NONE=0
+export readonly ETHERNET_ONLY=1
+export readonly WLAN_ONLY=2
+export readonly ALL=3
+
 # default vars
 : "${HARDWARE:="rpi"}"
 : "${ARCH:="aarch64"}"
@@ -13,4 +18,5 @@ set -euo pipefail
 : "${DEVICE_NAME:="/dev/sda"}"
 : "${BUILD_HOSTNAME:=""}"
 : "${TIMEZONE:="Asia/Singapore"}"
+: "${NETWORKING:="$ALL"}"
 : "${FORCE:=false}"

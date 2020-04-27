@@ -40,6 +40,10 @@
 #   -t TIMEZONE            Timezone.
 #                          Default: Asia/Singapore
 #
+#   -w NETWORKING          Networking options
+#                          Options: 0 (NONE), 1 (ETHERNET), 2 (WLAN), 3 (ALL)
+#                          Default: 3
+#
 #   -f FORCE               If true, don't ask before writing to the device.
 #                          Default: false
 #
@@ -72,7 +76,7 @@ if [[ ! -d "$DIR_BASE" ]]; then DIR_BASE="$PWD"; fi
 
 #================================= m a i n ====================================#
 
-while getopts 'd:a:m:b:v:p:n:t:fh' OPTION; do
+while getopts 'd:a:m:b:v:p:n:t:w:fh' OPTION; do
     case "$OPTION" in
     d) HARDWARE="$OPTARG" ;;
     a) ARCH="$OPTARG" ;;
@@ -82,6 +86,7 @@ while getopts 'd:a:m:b:v:p:n:t:fh' OPTION; do
     p) DEVICE_NAME="$OPTARG" ;;
     n) BUILD_HOSTNAME="$OPTARG" ;;
     t) TIMEZONE="$OPTARG" ;;
+    w) NETWORKING="$OPTARG" ;;
     f) FORCE=true ;;
     h)
         printf "alpine-diskless-headless-run v%s\n\n" "$VERSION"
@@ -111,7 +116,8 @@ einfo "running alpine-diskless-headless-run"
     -b "$ALPINE_BRANCH" \
     -v "$ALPINE_VERSION" \
     -n "$BUILD_HOSTNAME" \
-    -t "$TIMEZONE"
+    -t "$TIMEZONE" \
+    -w "$NETWORKING"
 
 # hardware boot
 "$DIR_BASE"/"$HARDWARE"/build.sh \
