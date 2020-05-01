@@ -71,7 +71,7 @@ depend() {
 }
 
 start() {
-    /sbin/apk fix
+    /sbin/apk fix --no-network
 }
 EOF
 
