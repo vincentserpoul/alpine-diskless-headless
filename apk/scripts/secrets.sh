@@ -38,11 +38,6 @@ secrets() {
     secret "users" "root.password" "root password"
     secret "users" "maintenance.password" "maintenance password"
 
-    secret "ssh" "authorized_keys" "ssh authorized keys (one for now)"
-    secret "ssh" "authorized_keys" "ssh authorized keys (one for now)"
-
-    secret "2fa" "google_authenticator" "2fa code"
-
     secret "wlan" "ssid" "wifi network ssid"
     secret "wlan" "password" "wifi password"
 }

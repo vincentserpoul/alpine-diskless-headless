@@ -21,8 +21,10 @@ dev-partition-full() {
         mklabel msdos \
         mkpart primary fat32 0% 256MiB \
         mkpart primary ext4 256MiB 100% \
-        set 1 boot on &&
-        mkfs.vfat -F 32 "$DEVICE_NAME"1 &&
+        set 1 boot on
+    # added for slow workstations
+    sleep 1s
+    mkfs.vfat -F 32 "$DEVICE_NAME"1 &&
         mkfs.ext4 -F "$DEVICE_NAME"2
 }
 

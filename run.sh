@@ -7,7 +7,7 @@
 #
 # Just insert a sdcard and run it with the right parameters.
 #
-# It has a few dependencies: qemu, chroot, parted.
+# It has a few dependencies: qemu-user-static, chroot, parted.
 #
 # Example:
 #   sudo sudo ./run.sh -n myalpine -f
@@ -149,3 +149,8 @@ einfo "extracting apk cache to main ext4 partition"
 mkdir -p "$DISK_MOUNT_POINT"/var/cache/apk
 tar xzf "$(helpers-apkcache-filepath-get "$ARCH" "$ALPINE_VERSION" "$BUILD_HOSTNAME")" -C "$DISK_MOUNT_POINT"/var/cache/apk
 dev-disk-umount "$DEVICE_NAME"
+
+einfo "finished successfully!"
+echo
+ewarn "to connect to your SBC, just put the sdcard in it, wait for it to boot and run:"
+ewarn "ssh -i ~/.ssh/id_ed25519_alpine_diskless maintenance@$BUILD_HOSTNAME"

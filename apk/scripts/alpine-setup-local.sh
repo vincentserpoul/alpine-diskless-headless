@@ -4,8 +4,6 @@ set -euo
 
 #==============================================================================#
 
-DIR_ALPINE_SETUP=$(CDPATH="cd -- $(dirname -- "$0")" && pwd)
-
 #================================ f u n c t i o n s ===========================#
 
 alpine_setup_hostname() {
@@ -119,7 +117,7 @@ alpine_setup_user() {
 
 alpine_change_pass() {
     USER=$1
-    PASS="$(cat "$DIR_ALPINE_SETUP"/secrets/users/"$USER".password)"
+    PASS="$(cat /secrets/users/"$USER".password)"
 
     echo "$USER":"$PASS" | /usr/sbin/chpasswd
 }
@@ -148,7 +146,7 @@ EOF
 
     # copy ssh keys
     mkdir -p /home/maintenance/.ssh
-    cat "$DIR_ALPINE_SETUP"/secrets/ssh/authorized_keys >/home/maintenance/.ssh/authorized_keys
+    cat /secrets/ssh/authorized_keys >/home/maintenance/.ssh/authorized_keys
 
     # setting up 2fa
     alpine_setup_ssh_2fa
@@ -165,18 +163,36 @@ alpine_setup_ssh_2fa() {
 
     sed -i 's/#UsePAM no/UsePAM yes/' /etc/ssh/sshd_config
 
-    GA_KEY="$(cat "$DIR_ALPINE_SETUP"/secrets/2fa/google_authenticator)"
+    GA_KEY_SECRET_PATH="/secrets/2fa/google_authenticator"
+    GA_CONF="/home/maintenance/.google_authenticator"
 
-    cat <<EOF >>/home/maintenance/.google_authenticator
-$GA_KEY
-" RATE_LIMIT 3 30
-" WINDOW_SIZE 17
-" TOTP_AUTH
+    # In case there is no existing google auth
+    if test ! -f "$GA_KEY_SECRET_PATH"; then
+        apk add libqrencode
 
+        echo
+        echo "Generating the two factor code to connect to your device"
+        echo
+
+        echo "synchronizing time..."
+        /usr/sbin/chronyd -s
+        su -c google-authenticator maintenance <<-EOF
+y
+-1
+y
+y
+y
+y
 EOF
-
-    chown maintenance:maintenance /home/maintenance/.google_authenticator
-    chmod 0600 /home/maintenance/.google_authenticator
+        apk del libqrencode
+        echo
+        echo "<Press any key> once you have scanned the QR Code with authy/google authenticator/... and saved your codes somewhere safe?"
+        read -r _
+    else
+        cat "$GA_KEY_SECRET_PATH" >"$GA_CONF"
+        chown maintenance:maintenance "$GA_CONF"
+        chmod 0600 "$GA_CONF"
+    fi
 }
 
 alpine_generate_ssh_keys() {
@@ -201,8 +217,8 @@ EOF
 
 alpine_setup_wlan() {
     BUILD_HOSTNAME=$1
-    SSID="$(cat "$DIR_ALPINE_SETUP"/secrets/wlan/ssid)"
-    PASSWORD="$(cat "$DIR_ALPINE_SETUP"/secrets/wlan/password)"
+    SSID="$(cat /secrets/wlan/ssid)"
+    PASSWORD="$(cat /secrets/wlan/password)"
 
     apk add wpa_supplicant
     rc-update add wpa_supplicant default
@@ -241,7 +257,7 @@ alpine_setup_apkcache_sync() {
 #=================================== l b u ====================================#
 
 alpine_setup_lbu_commit() {
-    lbu pkg "$DIR_ALPINE_SETUP"/alpine.apkovl.tar.gz
+    lbu pkg /alpine.apkovl.tar.gz
 }
 
 #==============================================================================#

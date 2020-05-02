@@ -1,6 +1,25 @@
 # Alpine diskless, headless install
 
-These scripts will help you build and write a headless install of alpine linux for SBC.
+/ ! \ THIS IS ALPHA, TO USE AT YOUR OWN RISKS / ! \
+
+## Goal
+
+The goal of this repo is to deploy a diskless configured alpine linux on sdcards destined to SBCs (single board computer, like a raspberry pi or rock pro 64).
+Sdcard reliablity tends to be an issue in the long run with SBCs.
+I decided to leverage the [diskless version of alpine linux](https://wiki.alpinelinux.org/wiki/Alpine_newbie_install_manual#diskless_mode) (running all in RAM) combined with the capability of [local backups, lbu for alpine](https://wiki.alpinelinux.org/wiki/Alpine_local_backup) to build a configured, running in RAM install of alpine linux!
+On top of this, leveraging qemu and chroot, you can build the filesystem directly from your powerful x86_64 workstation, without even touching a SBC.
+
+Once the sdcard is ready, you simply have to put it in your SBC and power it on.
+Once booted, you should be able to ssh into it (see examples below).
+
+## Decisions taken (security oriented)
+
+- No root access from ssh
+- User maintenance created as a sudoer, to connect via ssh and sudo
+- ssh only with ssh key and 2fa
+- to be further secured
+
+## Using it
 
 ```
 # Usage: ./run.sh [options]
@@ -10,7 +29,7 @@ These scripts will help you build and write a headless install of alpine linux f
 #
 # Just insert a sdcard and run it with the right parameters.
 #
-# It has a few dependencies: qemu, chroot, parted.
+# It has a few dependencies: qemu-user-static, chroot, parted.
 #
 # Example:
 #   sudo sudo ./run.sh -n myalpine -f
@@ -59,26 +78,48 @@ These scripts will help you build and write a headless install of alpine linux f
 # https://github.com/vincentserpoul/alpine-diskless-headless
 ```
 
-# Examples
+## Examples
 
 You have a rpi3B+, hostname test-magic, and you want ethernet and wlan
 
 ```bash
-sudo ./run.sh -n test-magictest-magic
+sudo ./run.sh -n test-magic
 ```
 
 You have a rpi0, hostname test-magic, and you only need wlan (armhf and no ethernet on rpi0)
 
 ```bash
-sudo ./run.sh -n test-magictest-magic -a armhf -w 2
+sudo ./run.sh -n test-magic -a armhf -w 2
 ```
+
+Once the rpi has booted, you should be able to ssh into it:
+
+```bash
+ssh -i ~/.ssh/id_ed25519_alpine_diskless maintenance@test-magic
+```
+
+## Troubleshooting
+
+### Restart from scratch
+
+```bash
+    rm -f ~/.ssh/id_ed25519_alpine_diskless*
+    rm -rf ./apk/secrets
+```
+
+<!-- TODO ADD MORE -->
+
+## Future
+
+This is a first version, working for rpis.
+The next step will be to include rockpro64.
+Then, we ll create a proper command cli, in order to handle configuration a bit better.
 
 # TODO
 
-- [ ] fix wlan dhcp
 - [ ] encrypt lbu
 - [ ] switch to rust or go cli
-- [ ] encrypt secrets (using [age](https://github.com/FiloSottile/age)?)
+- [ ] encrypt secrets (using [age](https://github.com/FiloSottile/age) or [sops](https://github.com/mozilla/sops) )
 - [ ] [ufw](https://wiki.alpinelinux.org/wiki/Uncomplicated_Firewall)
 
 # THANKS
