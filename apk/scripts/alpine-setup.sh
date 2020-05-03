@@ -56,6 +56,7 @@ alpine-setup-ssh-gen() {
 
     if [[ ! -d "$DIR_ALPINE_SETUP"/../secrets/ssh || ! -f "$SSH_KEY_PATH" ]]; then
         einfo "generating the ssh key to connect to your device:"
+        mkdir -p "$USER_HOME"/.ssh
         ssh-keygen -q -o -a 100 -t ed25519 -f "$SSH_KEY_PATH" -N ""
         chown "$SUDO_USER":"$SUDO_USER" "$SSH_KEY_PATH"
         chmod 0600 "$SSH_KEY_PATH"
