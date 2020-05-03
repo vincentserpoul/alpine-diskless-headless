@@ -48,6 +48,10 @@ done
 #===================================  M a i n  ================================#
 
 root-check
+dep-check chroot
+# We should check only for the targeted arch, but if the user has qemu-aarch64-static, he probably has the others
+dep-check qemu-aarch64-static
+
 helpers-build-hostname-check
 
 # Set default values
