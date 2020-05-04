@@ -1,4 +1,4 @@
-# Alpine diskless, headless install  ![Shellcheck](https://github.com/vincentserpoul/alpine-diskless-headless/workflows/Shellcheck/badge.svg)
+# Alpine diskless, headless install  ![Shellcheck](https://github.com/vincentserpoul/alpine-diskless-headless/workflows/Shellcheck/badge.svg?branch=master)
 / ! \ THIS IS ALPHA, TO USE AT YOUR OWN RISKS / ! \
 
 ## Goal
