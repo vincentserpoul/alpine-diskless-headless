@@ -56,15 +56,11 @@ helpers-build-hostname-check
 
 # Set default values
 # shellcheck source=/dev/null
-. """$BUILD_DIR""/../scripts/defaults.sh"
-
-# Check if build hostname is empty
-if [ -z "$BUILD_HOSTNAME" ]; then
-    die "you need to give a hostname as an argument: -n HOSTNAME"
-fi
+. """$BUILD_DIR""/scripts/defaults.sh"
 
 einfo "creating the local backup file (apkovl)"
 
+# secrets
 secrets
 
 # rootfs dir
@@ -73,13 +69,56 @@ apk-tools-umount-rootfs-dir-all "$ROOTFS_DIRECTORY"
 rm -rf "$ROOTFS_DIRECTORY"
 mkdir "$ROOTFS_DIRECTORY"
 
-apk-tools-downloadx "$ALPINE_MIRROR" "$ALPINE_BRANCH"
+apk-tools-downloadx "$ALPINE_MIRROR" "$ALPINE_BRANCH" "$BUILD_DIR/downloads"
 
 apk-tools-mount-rootfs-dir-all "$ROOTFS_DIRECTORY"
 
 apk-tools-install "$ROOTFS_DIRECTORY" "$ARCH" "$ALPINE_MIRROR" "$ALPINE_BRANCH"
 
-alpine-setup "$ROOTFS_DIRECTORY" "$ARCH" "$BUILD_HOSTNAME" "$ALPINE_MIRROR" "$ALPINE_BRANCH" "$ALPINE_VERSION" "$TIMEZONE" "$NETWORKING"
+alpine-prepare "$ROOTFS_DIRECTORY" "$ARCH" "$BUILD_HOSTNAME" "$ALPINE_VERSION"
+
+#================================  a l p i n e  ===============================#
+
+DNS="1.1.1.1"
+KEYMAP="us us"
+ROOT_PASSWORD=$(get_secret users root.password) \
+REMOTE_USER="maintenance" \
+REMOTE_USER_PASSWORD=$(get_secret users "$REMOTE_USER".password)
+AUTHORIZED_KEYS=$(get_secret ssh authorized_keys)
+
+chroot "$ROOTFS_DIRECTORY" /bin/sh -c \
+    " \
+    BUILD_HOSTNAME=\"$BUILD_HOSTNAME\" \
+    ALPINE_MIRROR=\"$ALPINE_MIRROR\" \
+    ALPINE_BRANCH=\"$ALPINE_BRANCH\" \
+    TIMEZONE=\"$TIMEZONE\" \
+    DNS=\"$DNS\" \
+    KEYMAP=\"$KEYMAP\" \
+    ROOT_PASSWORD=\"$ROOT_PASSWORD\" \
+    REMOTE_USER=\"$REMOTE_USER\" \
+    REMOTE_USER_PASSWORD=\"$REMOTE_USER_PASSWORD\" \
+    AUTHORIZED_KEYS=\"$AUTHORIZED_KEYS\" \
+    /chroot/base.sh \
+    "
+
+# run desired provisioners
+chroot "$ROOTFS_DIRECTORY" /bin/sh -c "REMOTE_USER=$REMOTE_USER /chroot/provisioners/twofa.sh"
+
+# Check ../../../scripts/defaults for the different values
+if test "$NETWORKING" = "$ETHERNET_ONLY" || test "$NETWORKING" = "$ALL"; then
+    chroot "$ROOTFS_DIRECTORY" /bin/sh -c "BUILD_HOSTNAME=\"$BUILD_HOSTNAME\" /chroot/provisioners/ethernet.sh"
+fi
+if test "$NETWORKING" = "$WLAN_ONLY" || test "$NETWORKING" = "$ALL"; then
+    WLAN_SSID=$(get_secret wlan ssid)
+    WLAN_PASSWORD=$(get_secret wlan password)
+    chroot "$ROOTFS_DIRECTORY" /bin/sh -c "BUILD_HOSTNAME=\"$BUILD_HOSTNAME\" WLAN_SSID=\"$WLAN_SSID\" WLAN_PASSWORD=\"$WLAN_PASSWORD\" /chroot/provisioners/wlan.sh"
+fi
+
+chroot "$ROOTFS_DIRECTORY" /chroot/lbu.sh
+
+#================================  a l p i n e  ===============================#
+
+alpine-teardown "$ROOTFS_DIRECTORY" "$ARCH" "$BUILD_HOSTNAME" "$ALPINE_VERSION"
 
 apk-tools-umount-rootfs-dir-all "$ROOTFS_DIRECTORY"
 

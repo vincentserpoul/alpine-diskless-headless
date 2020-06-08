@@ -19,8 +19,8 @@ if [[ ! -d "$DIR_ALPINE_SETUP" ]]; then DIR_ALPINE_SETUP="$PWD"; fi
 alpine-setup-apkcache-save() {
     local -r ROOTFS_DIR=$1
     local -r ARCH=$2
-    local -r ALPINE_VERSION=$3
-    local -r BUILD_HOSTNAME=$4
+    local -r BUILD_HOSTNAME=$3
+    local -r ALPINE_VERSION=$4
 
     einfo "backing up apk cache outside of rootfs"
 
@@ -37,28 +37,34 @@ alpine-setup-apkcache-save() {
 alpine-setup-apkovl-save() {
     local -r ROOTFS_DIR=$1
     local -r ARCH=$2
-    local -r ALPINE_VERSION=$3
-    local -r BUILD_HOSTNAME=$4
+    local -r BUILD_HOSTNAME=$3
+    local -r ALPINE_VERSION=$4
 
     einfo "backing up apkovl outside of rootfs"
 
     mkdir -p "$DIR_ALPINE_SETUP"/../apkovl
-    mv "$ROOTFS_DIR"/alpine.apkovl.tar.gz \
+    mv "$ROOTFS_DIR"/target/alpine.apkovl.tar.gz \
         "$(helpers-apkovl-filepath-get "$ARCH" "$ALPINE_VERSION" "$BUILD_HOSTNAME")"
 }
 
 #=================================== s s h ====================================#
 
 alpine-setup-ssh-gen() {
+    local SUDO_USER_LOCAL
+    if [[ -v SUDO_USER ]]; then
+        SUDO_USER_LOCAL="$SUDO_USER"
+    else
+        SUDO_USER_LOCAL="root"
+    fi
     local -r SSH_KEY_SECRET_PATH="$DIR_ALPINE_SETUP"/../secrets/ssh/authorized_keys
-    local -r USER_HOME=$(eval echo ~"$SUDO_USER")
+    local -r USER_HOME=$(eval echo ~"$SUDO_USER_LOCAL")
     local -r SSH_KEY_PATH="$USER_HOME/.ssh/id_ed25519_alpine_diskless"
 
     if [[ ! -d "$DIR_ALPINE_SETUP"/../secrets/ssh || ! -f "$SSH_KEY_PATH" ]]; then
         einfo "generating the ssh key to connect to your device:"
         mkdir -p "$USER_HOME"/.ssh
         ssh-keygen -q -o -a 100 -t ed25519 -f "$SSH_KEY_PATH" -N ""
-        chown "$SUDO_USER":"$SUDO_USER" "$SSH_KEY_PATH"
+        chown "$SUDO_USER_LOCAL":"$SUDO_USER_LOCAL" "$SSH_KEY_PATH"
         chmod 0600 "$SSH_KEY_PATH"
         mkdir -p "$DIR_ALPINE_SETUP"/../secrets/ssh
         cat "$SSH_KEY_PATH".pub >"$SSH_KEY_SECRET_PATH"
@@ -83,30 +89,31 @@ alpine-setup-2fa-save() {
 #==================================== M A I N =================================#
 #==============================================================================#
 
-alpine-setup() {
+alpine-prepare() {
     local -r ROOTFS_DIR=$1
     local -r ARCH=$2
     local -r BUILD_HOSTNAME=$3
-    local -r ALPINE_MIRROR=$4
-    local -r ALPINE_BRANCH=$5
-    local -r ALPINE_VERSION=$6
-    local -r TIMEZONE=$7
-    local -r NETWORKING=$8
+    local -r ALPINE_VERSION=$4
 
     # create a secure ssh key
     alpine-setup-ssh-gen
 
-    cp "$BUILD_DIR"/scripts/alpine-setup-local.sh "$ROOTFS_DIRECTORY"/
-    cp -r "$BUILD_DIR"/secrets "$ROOTFS_DIRECTORY"/
+    cp -r "$BUILD_DIR"/scripts/chroot "$ROOTFS_DIR"/
+    cp -r "$BUILD_DIR"/secrets "$ROOTFS_DIR"/
 
-    chroot "$ROOTFS_DIRECTORY" \
-        /alpine-setup-local.sh "$BUILD_HOSTNAME" "$ALPINE_MIRROR" "$ALPINE_BRANCH" "$TIMEZONE" "$NETWORKING"
+}
+
+alpine-teardown() {
+    local -r ROOTFS_DIR=$1
+    local -r ARCH=$2
+    local -r BUILD_HOSTNAME=$3
+    local -r ALPINE_VERSION=$4
 
     # IMPORTANT CLEANUP - DO NOT ERASE EVEN THOUGH NOT IN THE LCCAL BACKUP
-    rm "$ROOTFS_DIRECTORY"/alpine-setup-local.sh
-    rm -rf "$ROOTFS_DIRECTORY"/secrets
+    rm -rf "$ROOTFS_DIR"/chroot
+    rm -rf "$ROOTFS_DIR"/secrets
 
-    alpine-setup-apkcache-save "$ROOTFS_DIR" "$ARCH" "$ALPINE_VERSION" "$BUILD_HOSTNAME"
-    alpine-setup-apkovl-save "$ROOTFS_DIR" "$ARCH" "$ALPINE_VERSION" "$BUILD_HOSTNAME"
+    alpine-setup-apkcache-save "$ROOTFS_DIR" "$ARCH" "$BUILD_HOSTNAME" "$ALPINE_VERSION"
+    alpine-setup-apkovl-save "$ROOTFS_DIR" "$ARCH" "$BUILD_HOSTNAME" "$ALPINE_VERSION"
     alpine-setup-2fa-save "$ROOTFS_DIR"
 }

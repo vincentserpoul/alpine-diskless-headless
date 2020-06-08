@@ -10,13 +10,10 @@ export readonly WLAN_ONLY=2
 export readonly ALL=3
 
 # default vars
-: "${HARDWARE:="rpi"}"
 : "${ARCH:="aarch64"}"
 : "${ALPINE_MIRROR="http://dl-cdn.alpinelinux.org/alpine"}"
 : "${ALPINE_BRANCH:="latest-stable"}"
 : "${ALPINE_VERSION:="3.12.0"}"
-: "${DEVICE_NAME:="/dev/sda"}"
 : "${BUILD_HOSTNAME:=""}"
 : "${TIMEZONE:="Asia/Singapore"}"
 : "${NETWORKING:="$ALL"}"
-: "${FORCE:=false}"

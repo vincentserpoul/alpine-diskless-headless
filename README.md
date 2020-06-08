@@ -1,4 +1,5 @@
-# Alpine diskless, headless install  ![Shellcheck](https://github.com/vincentserpoul/alpine-diskless-headless/workflows/Shellcheck/badge.svg?branch=master)
+# Alpine diskless, headless install ![Shellcheck](https://github.com/vincentserpoul/alpine-diskless-headless/workflows/Shellcheck/badge.svg?branch=master)
+
 / ! \ THIS IS ALPHA, TO USE AT YOUR OWN RISKS / ! \
 
 ## Goal
@@ -50,7 +51,7 @@ Once booted, you should be able to ssh into it (see examples below).
 #                          Default: latest-stable
 #
 #   -v ALPINE_VERSION      Alpine version to install.
-#                          Default: 3.11.6
+#                          Default: 3.12.0
 #
 #   -p DEVICE_NAME         Name of the device to write to.
 #                          Default: /dev/sda
