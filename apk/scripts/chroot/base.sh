@@ -10,18 +10,6 @@ alpine_setup_apkcache_config() {
     ln -s /var/cache/apk /etc/apk/cache
 }
 
-alpine_setup_apkcache_sync() {
-    # fetching all deps in the apk cache
-    apk cache sync
-
-    # move the cache var to where it will be mounted
-    rm /etc/apk/cache
-    ln -s /media/mmcblk0p2/var/cache/apk /etc/apk/cache
-
-    # adding the first ext4 partition to the fstab, to have the var cache at startup
-    echo "/dev/mmcblk0p2 /media/mmcblk0p2 ext4 rw,relatime 0 0" >>/etc/fstab
-}
-
 #===============================  h o s t n a m e  ============================#
 
 #===============================  e n v  v a r s  =============================#
@@ -267,4 +255,3 @@ alpine_setup_reinstall_pkg_boot
 alpine_setup_initd
 alpine_setup_user "$ROOT_PASSWORD" "$REMOTE_USER" "$REMOTE_USER_PASSWORD"
 alpine_setup_ssh "$AUTHORIZED_KEYS" "$REMOTE_USER"
-alpine_setup_apkcache_sync

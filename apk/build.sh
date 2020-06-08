@@ -114,7 +114,7 @@ if test "$NETWORKING" = "$WLAN_ONLY" || test "$NETWORKING" = "$ALL"; then
     chroot "$ROOTFS_DIRECTORY" /bin/sh -c "BUILD_HOSTNAME=\"$BUILD_HOSTNAME\" WLAN_SSID=\"$WLAN_SSID\" WLAN_PASSWORD=\"$WLAN_PASSWORD\" /chroot/provisioners/wlan.sh"
 fi
 
-chroot "$ROOTFS_DIRECTORY" /chroot/lbu.sh
+chroot "$ROOTFS_DIRECTORY" /chroot/cache-lbu.sh
 
 #================================  a l p i n e  ===============================#
 
