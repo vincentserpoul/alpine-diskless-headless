@@ -29,7 +29,7 @@
 #                          Default: latest-stable
 #
 #   -v ALPINE_VERSION      Alpine version to install.
-#                          Default: 3.11.6
+#                          Default: 3.12.0
 #
 #   -p DEVICE_NAME         Name of the device to write to.
 #                          Default: /dev/sda

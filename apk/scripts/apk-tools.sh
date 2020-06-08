@@ -62,10 +62,9 @@ apk-tools-latest-version-get() {
 apk-tools-downloadx() {
     local -r ALPINE_MIRROR=$1
     local -r ALPINE_BRANCH=$2
+    local -r FILE_DIR=$3
 
     local -r LIST_URL="$ALPINE_MIRROR"/"$ALPINE_BRANCH"/main/"$ARCH"
-
-    local -r FILE_DIR="""$DIR_APK_TOOLS""/../downloads"
 
     local -r FILE_NAME="$(apk-tools-latest-version-get "$LIST_URL")"
 

@@ -41,3 +41,13 @@ secrets() {
     secret "wlan" "ssid" "wifi network ssid"
     secret "wlan" "password" "wifi password"
 }
+
+get_secret() {
+    local -r CATEGORY=$1
+    local -r KEY=$2
+
+    local -r FILE_DIR="$DIR_SECRETS"/../secrets/"$CATEGORY"
+    local -r FILE_PATH="$FILE_DIR"/"$KEY"
+
+    cat "$FILE_PATH"
+}
