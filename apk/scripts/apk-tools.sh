@@ -16,39 +16,6 @@ if [[ ! -d "$DIR_APK_TOOLS" ]]; then DIR_APK_TOOLS="$PWD"; fi
 #=============================== a p k - t o o l s ============================#
 #==============================================================================#
 
-#=============================== u t i l s ====================================#
-
-apk-tools-mount-rootfs-dir-all() {
-    local -r ROOTFS_DIR=$1
-
-    einfo "mounting proc, sys, dev in ""$ROOTFS_DIR"""
-
-    mkdir -p "$ROOTFS_DIR"/proc
-    mkdir -p "$ROOTFS_DIR"/sys
-    mkdir -p "$ROOTFS_DIR"/dev
-
-    mount -v -t proc none "$ROOTFS_DIR"/proc/
-    mount -v --rbind /sys "$ROOTFS_DIR"/sys/
-    mount --make-rprivate "$ROOTFS_DIR"/sys/
-    mount -v --rbind /dev "$ROOTFS_DIR"/dev/
-    mount --make-rprivate "$ROOTFS_DIR"/dev/
-}
-
-apk-tools-umount-rootfs-dir-all() {
-    local -r ROOTFS_DIR=$1
-
-    einfo "unmounting proc, sys, dev from ""$ROOTFS_DIR"""
-
-    umount "$ROOTFS_DIR"/dev --lazy >/dev/null 2>&1 || true
-    umount "$ROOTFS_DIR"/proc --lazy >/dev/null 2>&1 || true
-    umount "$ROOTFS_DIR"/sys --lazy >/dev/null 2>&1 || true
-
-    rmdir "$ROOTFS_DIR"/proc >/dev/null 2>&1 || true
-    rmdir "$ROOTFS_DIR"/sys >/dev/null 2>&1 || true
-    rmdir "$ROOTFS_DIR"/dev >/dev/null 2>&1 || true
-
-}
-
 #============================= d o w n l o a d ================================#
 
 apk-tools-latest-version-get() {
@@ -60,9 +27,10 @@ apk-tools-latest-version-get() {
 }
 
 apk-tools-downloadx() {
-    local -r ALPINE_MIRROR=$1
-    local -r ALPINE_BRANCH=$2
-    local -r FILE_DIR=$3
+    local -r ARCH=$1
+    local -r ALPINE_MIRROR=$2
+    local -r ALPINE_BRANCH=$3
+    local -r FILE_DIR=$4
 
     local -r LIST_URL="$ALPINE_MIRROR"/"$ALPINE_BRANCH"/main/"$ARCH"
 

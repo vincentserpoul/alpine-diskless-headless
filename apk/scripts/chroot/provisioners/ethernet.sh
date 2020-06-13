@@ -6,23 +6,24 @@ set -eu
 
 #===============================  e n v  v a r s  =============================#
 
-: "${BUILD_HOSTNAME?Need to set BUILD_HOSTNAME}"
+# base config
+
+# hostname
+: "${BASE_HOSTNAME?Need to set BASE_HOSTNAME}"
 
 #==============================  e t h e r n e t  ============================#
 
-alpine_setup_eth() {
-    BUILD_HOSTNAME=$1
+provisioner_ethernet() {
+    BASE_HOSTNAME=$1
     cat <<EOF >>/etc/network/interfaces
 
 auto eth0
 iface eth0 inet dhcp
-    hostname $BUILD_HOSTNAME
+    hostname $BASE_HOSTNAME
 
 EOF
 }
 
 #==============================================================================#
 
-printf "\n> ethernet setup\n"
-
-alpine_setup_eth "$BUILD_HOSTNAME"
+provisioner_ethernet "$BASE_HOSTNAME"

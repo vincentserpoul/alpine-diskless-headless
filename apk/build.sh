@@ -4,7 +4,7 @@ set -euo pipefail
 
 #==============================================================================#
 
-readonly VERSION="1.0.0"
+readonly VERSION="2.0.0"
 
 #============================== i n c l u d e s ===============================#
 
@@ -16,7 +16,7 @@ if [[ ! -d "$BUILD_DIR" ]]; then BUILD_DIR="$PWD"; fi
 # shellcheck source=/dev/null
 . """$BUILD_DIR""/../scripts/helpers.sh"
 # shellcheck source=/dev/null
-. """$BUILD_DIR""/scripts/secrets.sh"
+. """$BUILD_DIR""/scripts/rootfs-mounts.sh"
 # shellcheck source=/dev/null
 . """$BUILD_DIR""/scripts/apk-tools.sh"
 # shellcheck source=/dev/null
@@ -25,15 +25,10 @@ if [[ ! -d "$BUILD_DIR" ]]; then BUILD_DIR="$PWD"; fi
 #===================================  M a i n  ================================#
 
 #===================================  M e n u  ================================#
-while getopts 'a:b:v:m:n:t:w:h' OPTION; do
+
+while getopts 'c:h' OPTION; do
     case "$OPTION" in
-    a) ARCH="$OPTARG" ;;
-    m) ALPINE_MIRROR="$OPTARG" ;;
-    b) ALPINE_BRANCH="$OPTARG" ;;
-    v) ALPINE_VERSION="$OPTARG" ;;
-    n) BUILD_HOSTNAME="$OPTARG" ;;
-    t) TIMEZONE="$OPTARG" ;;
-    w) NETWORKING="$OPTARG" ;;
+    c) CONFIG_FILE_PATH="$OPTARG" ;;
     h)
         echo "alpine-diskless-headless-apk-build v""$VERSION"""
         exit 0
@@ -48,78 +43,89 @@ done
 #===================================  M a i n  ================================#
 
 root-check
+
+#==============================  d e p  c h e c k  ============================#
+
+einfo "checking dependencies"
+
 dep-check chroot
 # We should check only for the targeted arch, but if the user has qemu-aarch64-static, he probably has the others
 dep-check qemu-aarch64-static
 
-helpers-build-hostname-check
+#================================  c o n f i g  ===============================#
 
-# Set default values
+einfo "checking config"
+
+# check if config is present
+if [[ -z ${CONFIG_FILE_PATH+x} ]]; then
+    die "you need to supply a config path -c <CONFIG_FILE_PATH>"
+fi
+if [[ ! -f "$CONFIG_FILE_PATH" ]]; then
+    die "the config path you supplied is not valid"
+fi
+
+# turn relative into absolute
+CONFIG_FILE_PATH="$(cd "$(dirname "$CONFIG_FILE_PATH")" && pwd)/$(basename "$CONFIG_FILE_PATH")"
+
+# Load the config
 # shellcheck source=/dev/null
-. """$BUILD_DIR""/scripts/defaults.sh"
+. "$CONFIG_FILE_PATH"
 
-einfo "creating the local backup file (apkovl)"
+readonly CONFIG_DIR=$(dirname "$CONFIG_FILE_PATH")
 
-# secrets
-secrets
+# check if hostname is filled
+helpers-base-hostname-check
+
+#===============================  r o o t f s   ===============================#
+
+einfo "preparing rootfs"
 
 # rootfs dir
-readonly ROOTFS_DIRECTORY="""$BUILD_DIR""/rootfs"
-apk-tools-umount-rootfs-dir-all "$ROOTFS_DIRECTORY"
+if [[ -z ${ROOTFS_DIRECTORY+x} ]]; then
+    ROOTFS_DIRECTORY="""$BUILD_DIR""/rootfs"
+fi
+rootfs-unmount-all "$ROOTFS_DIRECTORY"
 rm -rf "$ROOTFS_DIRECTORY"
 mkdir "$ROOTFS_DIRECTORY"
 
-apk-tools-downloadx "$ALPINE_MIRROR" "$ALPINE_BRANCH" "$BUILD_DIR/downloads"
+#===============================  a p k o v l   ===============================#
 
-apk-tools-mount-rootfs-dir-all "$ROOTFS_DIRECTORY"
+einfo "extracting and installing apk tools"
 
-apk-tools-install "$ROOTFS_DIRECTORY" "$ARCH" "$ALPINE_MIRROR" "$ALPINE_BRANCH"
+apk-tools-downloadx "$BASE_ARCH" "$BASE_ALPINE_MIRROR" "$BASE_ALPINE_BRANCH" "$BUILD_DIR/downloads"
 
-alpine-prepare "$ROOTFS_DIRECTORY" "$ARCH" "$BUILD_HOSTNAME" "$ALPINE_VERSION"
+rootfs-mount-all "$ROOTFS_DIRECTORY"
+
+apk-tools-install "$ROOTFS_DIRECTORY" "$BASE_ARCH" "$BASE_ALPINE_MIRROR" "$BASE_ALPINE_BRANCH"
 
 #================================  a l p i n e  ===============================#
 
-DNS="1.1.1.1"
-KEYMAP="us us"
-ROOT_PASSWORD=$(get_secret users root.password) \
-REMOTE_USER="maintenance" \
-REMOTE_USER_PASSWORD=$(get_secret users "$REMOTE_USER".password)
-AUTHORIZED_KEYS=$(get_secret ssh authorized_keys)
+alpine-setup-prepare "$ROOTFS_DIRECTORY" "$CONFIG_DIR"
 
-chroot "$ROOTFS_DIRECTORY" /bin/sh -c \
-    " \
-    BUILD_HOSTNAME=\"$BUILD_HOSTNAME\" \
-    ALPINE_MIRROR=\"$ALPINE_MIRROR\" \
-    ALPINE_BRANCH=\"$ALPINE_BRANCH\" \
-    TIMEZONE=\"$TIMEZONE\" \
-    DNS=\"$DNS\" \
-    KEYMAP=\"$KEYMAP\" \
-    ROOT_PASSWORD=\"$ROOT_PASSWORD\" \
-    REMOTE_USER=\"$REMOTE_USER\" \
-    REMOTE_USER_PASSWORD=\"$REMOTE_USER_PASSWORD\" \
-    AUTHORIZED_KEYS=\"$AUTHORIZED_KEYS\" \
-    /chroot/base.sh \
-    "
+einfo "installing base alpine"
 
-# run desired provisioners
-chroot "$ROOTFS_DIRECTORY" /bin/sh -c "REMOTE_USER=$REMOTE_USER /chroot/provisioners/twofa.sh"
+chroot "$ROOTFS_DIRECTORY" /bin/sh -c "set -a && . /config/config.env && set +a && /chroot/base.sh"
 
-# Check ../../../scripts/defaults for the different values
-if test "$NETWORKING" = "$ETHERNET_ONLY" || test "$NETWORKING" = "$ALL"; then
-    chroot "$ROOTFS_DIRECTORY" /bin/sh -c "BUILD_HOSTNAME=\"$BUILD_HOSTNAME\" /chroot/provisioners/ethernet.sh"
-fi
-if test "$NETWORKING" = "$WLAN_ONLY" || test "$NETWORKING" = "$ALL"; then
-    WLAN_SSID=$(get_secret wlan ssid)
-    WLAN_PASSWORD=$(get_secret wlan password)
-    chroot "$ROOTFS_DIRECTORY" /bin/sh -c "BUILD_HOSTNAME=\"$BUILD_HOSTNAME\" WLAN_SSID=\"$WLAN_SSID\" WLAN_PASSWORD=\"$WLAN_PASSWORD\" /chroot/provisioners/wlan.sh"
-fi
+einfo "installing provisioners $PROVISIONERS"
 
+# loop through provisioners
+for PROV in $PROVISIONERS; do
+    einfo "installing provisioner $PROV"
+    chroot "$ROOTFS_DIRECTORY" /bin/sh -c "set -a && . /config/config.env && set +a && /chroot/provisioners/$PROV.sh"
+done
+
+einfo "saving cache and lbu"
+
+# Save lbu and apk cache
 chroot "$ROOTFS_DIRECTORY" /chroot/cache-lbu.sh
 
-#================================  a l p i n e  ===============================#
+# Move lbu and apk cache outside of rootfs
+alpine-setup-backup "$ROOTFS_DIRECTORY" "$CONFIG_DIR"
 
-alpine-teardown "$ROOTFS_DIRECTORY" "$ARCH" "$BUILD_HOSTNAME" "$ALPINE_VERSION"
+#==============================  t e a r d o w n  =============================#
 
-apk-tools-umount-rootfs-dir-all "$ROOTFS_DIRECTORY"
+einfo "tearing down root folder and unmounting"
+
+rootfs-unmount-all "$ROOTFS_DIRECTORY"
 
 rm -rf "$ROOTFS_DIRECTORY"
