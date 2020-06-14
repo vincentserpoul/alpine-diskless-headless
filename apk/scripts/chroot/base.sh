@@ -60,10 +60,16 @@ alpine_setup_repositories() {
 alpine_setup_dns() {
     ALL_DNS=$1
 
+    rm /etc/resolv.conf
     touch /etc/resolv.conf
-    for DNS in $ALL_DNS; do
-        echo "nameserver $DNS" >>/etc/resolv.conf
+
+    #Print the split string
+    DELIMITER=", "
+    while test "${ALL_DNS#*$DELIMITER}" != "$ALL_DNS"; do
+        echo "nameserver ${ALL_DNS%%$DELIMITER*}" >>/etc/resolv.conf
+        ALL_DNS="${ALL_DNS#*$DELIMITER}"
     done
+    echo "nameserver $ALL_DNS" >>/etc/resolv.conf
 }
 
 #=================================  k e y m a p  ==============================#
@@ -175,9 +181,12 @@ EOF
     # copy ssh keys
     mkdir -p /home/"$BASE_USERS_REMOTE_USER"/.ssh
     #Print the split string
-    for AK in $BASE_SSH_AUTHORIZED_KEYS; do
-        echo "$AK" >/home/"$BASE_USERS_REMOTE_USER"/.ssh/authorized_keys
+    DELIMITER=", "
+    while test "${BASE_SSH_AUTHORIZED_KEYS#*$DELIMITER}" != "$BASE_SSH_AUTHORIZED_KEYS"; do
+        echo "${BASE_SSH_AUTHORIZED_KEYS%%$DELIMITER*}" >>/home/"$BASE_USERS_REMOTE_USER"/.ssh/authorized_keys
+        BASE_SSH_AUTHORIZED_KEYS="${BASE_SSH_AUTHORIZED_KEYS#*$DELIMITER}"
     done
+    echo "$BASE_SSH_AUTHORIZED_KEYS" >>/home/"$BASE_USERS_REMOTE_USER"/.ssh/authorized_keys
 
     # generate local ssh keys
     alpine_generate_ssh_keys

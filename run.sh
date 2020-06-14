@@ -62,7 +62,7 @@ while getopts 'r:d:c:fh' OPTION; do
     r) HARDWARE="$OPTARG" ;;
     d) DEVICE_NAME="$OPTARG" ;;
     c) CONFIG_FILE_PATH="$OPTARG" ;;
-    f) FORCE_DEV_WRITE="$OPTARG" ;;
+    f) FORCE_DEV_WRITE=true ;;
     h)
         echo "alpine-diskless-headless-apk-build v""$VERSION"""
         exit 0
