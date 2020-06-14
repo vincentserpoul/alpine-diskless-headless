@@ -15,8 +15,7 @@ Once booted, you should be able to ssh into it (see examples below).
 ## Decisions taken (security oriented)
 
 - No root access from ssh
-- User maintenance created as a sudoer, to connect via ssh and sudo
-- ssh only with ssh key and 2fa
+- ssh only with ssh key and, if you add the provider, 2fa
 - to be further secured
 
 ## Using it
@@ -32,41 +31,20 @@ Once booted, you should be able to ssh into it (see examples below).
 # It has a few dependencies: qemu-user-static, chroot, parted.
 #
 # Example:
-#   sudo sudo ./run.sh -n myalpine -f
+#   sudo sudo ./run.sh -d rpi -f
 #
 # Options and environment variables:
 #
-#   -d HARDWARE            which SMB you are targeting.
+#   -r HARDWARE            which SMB you are targeting.
 #                          Options: rpi
 #                          Default: rpi
 #
-#   -a ARCH                CPU architecture for the SMB.
-#                          Options: x86_64, x86, aarch64, armhf, armv7, ppc64le, s390x.
-#                          Default: aarch64
-#
-#   -m ALPINE_MIRROR...    URI of the Aports mirror to fetch packages from.
-#                          Default: http://dl-cdn.alpinelinux.org/alpine
-#
-#   -b ALPINE_BRANCH       Alpine branch to install.
-#                          Default: latest-stable
-#
-#   -v ALPINE_VERSION      Alpine version to install.
-#                          Default: 3.12.0
-#
-#   -p DEVICE_NAME         Name of the device to write to.
+#   -d DEVICE_NAME         Name of the device to write to.
 #                          Default: /dev/sda
 #
-#   -n BUILD_HOSTNAME      Hostname. Must be filled
-#                          No default
+#   -c CONFIG_FILE_PATH    path of the config.env file
 #
-#   -t TIMEZONE            Timezone.
-#                          Default: Asia/Singapore
-#
-#   -w NETWORKING          Networking options
-#                          Options: 0 (NONE), 1 (ETHERNET), 2 (WLAN), 3 (ALL)
-#                          Default: 3
-#
-#   -f FORCE               If true, don't ask before writing to the device.
+#   -f FORCE_DEV_WRITE     If true, don't ask before writing to the device.
 #                          Default: false
 #
 #   -h                     Show this help message and exit.
@@ -80,43 +58,53 @@ Once booted, you should be able to ssh into it (see examples below).
 
 ## Examples
 
-You have a rpi3B+, hostname test-magic, and you want ethernet and wlan
+### rpi3b+
+
+You have a rpi3B+, you want to set it with a hostname "pleine-lune" and want to use ethernet connection only (you can add the wlan with provisioners), look into [pleine-lune example config](./example/pleine-lune-rpi3b+)
+
+modify accordingly and run
 
 ```bash
-sudo ./run.sh -n test-magic
+sudo ./run.sh -c ./example/pleine-lune-rpi3b+/config.env -d /dev/sda
 ```
 
-You have a rpi0, hostname test-magic, and you only need wlan (armhf and no ethernet on rpi0)
+### rpi0
+
+You have a rpi0, you want to set it with a hostname "pleine-lune" and can only use wlan (notice the provisioner), look into [pleine-lune example config](./example/pleine-lune-rpi0)
+
+modify accordingly and run
 
 ```bash
-sudo ./run.sh -n test-magic -a armhf -w 2
+sudo ./run.sh -c ./example/pleine-lune-rpi0/config.env -d /dev/sda
 ```
 
-Once the rpi has booted, you should be able to ssh into it:
+### Accessing the rpi
+
+Once the rpi has booted, you should be able to ssh into it, with one of the keys you configured in BASE_SSH_AUTHORIZED_KEYS, in the config you specified
 
 ```bash
-ssh -i ~/.ssh/id_ed25519_alpine_diskless maintenance@test-magic
+ssh -i ~/.ssh/id_ed25519_alpine_diskless maintenance@pleine-lune
 ```
 
 ## Troubleshooting
 
-### Restart from scratch
+### ssh tries to connect with IPV6
+
+Find out the ipv4 IP your rpi has been attributed and replace your hostname with it.
 
 ```bash
-    rm -f ~/.ssh/id_ed25519_alpine_diskless*
-    rm -rf ./apk/secrets
+ssh -i ~/.ssh/id_ed25519_alpine_diskless maintenance@192.168.1.102
 ```
-
-<!-- TODO ADD MORE -->
 
 ## Future
 
 This is a first version, working for rpis.
-The next step will be to include rockpro64.
+
 Then, we ll create a proper command cli, in order to handle configuration a bit better.
 
 # TODO
 
+- [ ] use docker
 - [ ] encrypt lbu
 - [ ] switch to rust or go cli
 - [ ] encrypt secrets (using [age](https://github.com/FiloSottile/age) or [sops](https://github.com/mozilla/sops) )
@@ -128,7 +116,3 @@ Then, we ll create a proper command cli, in order to handle configuration a bit 
 - https://github.com/knoopx/alpine-raspberry-pi
 - https://github.com/yangxuan8282/gen-rpi_os/blob/master/gen-alpine_rpi.sh
 - https://hütter.ch/posts/pitaya-alpine/#preparations
-
-```
-
-```

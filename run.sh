@@ -14,14 +14,14 @@
 #
 # Options and environment variables:
 #
+#   -c CONFIG_FILE_PATH    path of the config.env file
+#
+#   -d DEVICE_NAME         Name of the device to write to. for example /dev/sda
+#                          Default: no default, must be filled
+#
 #   -r HARDWARE            which SMB you are targeting.
 #                          Options: rpi
 #                          Default: rpi
-#
-#   -d DEVICE_NAME         Name of the device to write to.
-#                          Default: /dev/sda
-#
-#   -c CONFIG_FILE_PATH    path of the config.env file
 #
 #   -f FORCE_DEV_WRITE     If true, don't ask before writing to the device.
 #                          Default: false
@@ -76,7 +76,6 @@ done
 
 # default vars
 : "${HARDWARE:="rpi"}"
-: "${DEVICE_NAME:="/dev/sda"}"
 : "${FORCE_DEV_WRITE:=false}"
 
 #================================  c o n f i g  ===============================#
@@ -102,9 +101,15 @@ readonly CONFIG_DIR=$(dirname "$CONFIG_FILE_PATH")
 
 # check if hostname is filled
 helpers-base-hostname-check
+
 #===================================  M a i n  ================================#
 
 root-check
+
+# Check if device name is filled
+if [ -z "$DEVICE_NAME" ]; then
+    die "you need to specify a device with -d option. for example: -d /dev/sda"
+fi
 
 einfo "running alpine-diskless-headless-run"
 
@@ -141,4 +146,4 @@ dev-disk-umount "$DEVICE_NAME"
 einfo "finished successfully!"
 echo
 ewarn "to connect to your SBC, just put the sdcard in it, wait for it to boot and run:"
-ewarn "ssh -i ~/.ssh/id_ed25519_alpine_diskless maintenance@$BASE_HOSTNAME"
+ewarn "ssh -i YOURSSHKEY maintenance@$BASE_HOSTNAME"
