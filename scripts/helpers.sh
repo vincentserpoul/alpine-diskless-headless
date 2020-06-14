@@ -14,10 +14,10 @@ if [[ ! -d "$DIR_HELPERS" ]]; then DIR_HELPERS="$PWD"; fi
 
 #==============================================================================#
 
-helpers-build-hostname-check() {
+helpers-base-hostname-check() {
     # Check if build hostname is empty
-    if [ -z "$BUILD_HOSTNAME" ]; then
-        die "you need to give a hostname as an argument: -n HOSTNAME"
+    if [ -z "$BASE_HOSTNAME" ]; then
+        die "you need to specify a hostname in the config file: BASE_HOSTNAME"
     fi
 }
 

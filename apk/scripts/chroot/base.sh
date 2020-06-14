@@ -14,36 +14,36 @@ alpine_setup_apkcache_config() {
 
 #===============================  e n v  v a r s  =============================#
 
-: "${BUILD_HOSTNAME?Need to set BUILD_HOSTNAME}"
+: "${BASE_HOSTNAME?Need to set BASE_HOSTNAME}"
 
 #==============================================================================#
 
 alpine_setup_hostname() {
-    BUILD_HOSTNAME=$1
+    BASE_HOSTNAME=$1
 
-    setup-hostname -n "$BUILD_HOSTNAME"
-    hostname "$BUILD_HOSTNAME"
+    setup-hostname -n "$BASE_HOSTNAME"
+    hostname "$BASE_HOSTNAME"
 
-    printf "Welcome to %s!\n\n" "$BUILD_HOSTNAME" >/etc/motd
+    printf "Welcome to %s!\n\n" "$BASE_HOSTNAME" >/etc/motd
 }
 
 #============================  r e p o s i t o r i e s  =======================#
 
 #===============================  e n v  v a r s  =============================#
 
-: "${ALPINE_MIRROR?Need to set ALPINE_MIRROR (http:\/\/dl-cdn.alpinelinux.org\/alpine...)}"
-: "${ALPINE_BRANCH?Need to set ALPINE_BRANCH (latest-stable...)}"
+: "${BASE_ALPINE_MIRROR?Need to set BASE_ALPINE_MIRROR (http:\/\/dl-cdn.alpinelinux.org\/alpine...)}"
+: "${BASE_ALPINE_BRANCH?Need to set BASE_ALPINE_BRANCH (latest-stable...)}"
 
 #==============================================================================#
 
 alpine_setup_repositories() {
-    ALPINE_MIRROR=$1
-    ALPINE_BRANCH=$2
+    BASE_ALPINE_MIRROR=$1
+    BASE_ALPINE_BRANCH=$2
 
     mkdir -p /etc/apk
     printf '%s\n' \
-        "$ALPINE_MIRROR/$ALPINE_BRANCH/main" \
-        "$ALPINE_MIRROR/$ALPINE_BRANCH/community" \
+        "$BASE_ALPINE_MIRROR/$BASE_ALPINE_BRANCH/main" \
+        "$BASE_ALPINE_MIRROR/$BASE_ALPINE_BRANCH/community" \
         >/etc/apk/repositories
 
     setup-apkrepos -1
@@ -53,29 +53,38 @@ alpine_setup_repositories() {
 
 #===============================  e n v  v a r s  =============================#
 
-: "${DNS?Need to set DNS (8.8.8.8 1.1.1.1 ...)}"
+: "${BASE_NETWORKING_DNS_NAMESERVERS?Need to set BASE_NETWORKING_DNS_NAMESERVERS (8.8.8.8 1.1.1.1 ...)}"
 
 #==============================================================================#
 
 alpine_setup_dns() {
-    DNS=$1
+    ALL_DNS=$1
 
-    setup-dns -d "none" -n "$DNS"
+    rm /etc/resolv.conf
+    touch /etc/resolv.conf
+
+    #Print the split string
+    DELIMITER=", "
+    while test "${ALL_DNS#*$DELIMITER}" != "$ALL_DNS"; do
+        echo "nameserver ${ALL_DNS%%$DELIMITER*}" >>/etc/resolv.conf
+        ALL_DNS="${ALL_DNS#*$DELIMITER}"
+    done
+    echo "nameserver $ALL_DNS" >>/etc/resolv.conf
 }
 
 #=================================  k e y m a p  ==============================#
 
 #===============================  e n v  v a r s  =============================#
 
-: "${KEYMAP?Need to set KEYMAP (us us...)}"
+: "${BASE_ALPINE_KEYMAP?Need to set BASE_ALPINE_KEYMAP (us us...)}"
 
 #==============================================================================#
 
 alpine_setup_keymap() {
-    KEYMAP=$1
+    BASE_ALPINE_KEYMAP=$1
 
-    LAYOUT="${KEYMAP% *}"
-    VARIANT="${KEYMAP#* }"
+    LAYOUT="${BASE_ALPINE_KEYMAP% *}"
+    VARIANT="${BASE_ALPINE_KEYMAP#* }"
 
     setup-keymap "$LAYOUT" "$VARIANT"
 }
@@ -84,14 +93,14 @@ alpine_setup_keymap() {
 
 #===============================  e n v  v a r s  =============================#
 
-: "${TIMEZONE?Need to set TIMEZONE (Asia\/Singapore)}"
+: "${BASE_ALPINE_TIMEZONE?Need to set BASE_ALPINE_TIMEZONE (Asia\/Singapore)}"
 
 #==============================================================================#
 
 alpine_setup_timezone() {
-    TIMEZONE=$1
+    BASE_ALPINE_TIMEZONE=$1
 
-    setup-timezone -z "$TIMEZONE"
+    setup-timezone -z "$BASE_ALPINE_TIMEZONE"
 }
 
 #==============================  n e t w o r k i n g  =========================#
@@ -106,28 +115,28 @@ EOF
 
 #====================================  u s e r  ===============================#
 
-: "${ROOT_PASSWORD?Need to set ROOT_PASSWORD}"
-: "${REMOTE_USER?Need to set REMOTE_USER}"
-: "${REMOTE_USER_PASSWORD?Need to set REMOTE_USER_PASSWORD}"
+: "${BASE_USERS_ROOT_PASSWORD?Need to set BASE_USERS_ROOT_PASSWORD}"
+: "${BASE_USERS_REMOTE_USER?Need to set BASE_USERS_REMOTE_USER}"
+: "${BASE_USERS_REMOTE_USER_PASSWORD?Need to set BASE_USERS_REMOTE_USER_PASSWORD}"
 
 alpine_setup_user() {
-    ROOT_PASSWORD=$1
-    REMOTE_USER=$2
-    REMOTE_USER_PASSWORD=$3
+    BASE_USERS_ROOT_PASSWORD=$1
+    BASE_USERS_REMOTE_USER=$2
+    BASE_USERS_REMOTE_USER_PASSWORD=$3
 
-    alpine_change_pass root "$ROOT_PASSWORD"
+    alpine_change_pass root "$BASE_USERS_ROOT_PASSWORD"
 
-    /usr/sbin/addgroup -S "$REMOTE_USER"
-    /usr/sbin/adduser "$REMOTE_USER" --ingroup "$REMOTE_USER" --disabled-password --shell /bin/ash
+    /usr/sbin/addgroup -S "$BASE_USERS_REMOTE_USER"
+    /usr/sbin/adduser "$BASE_USERS_REMOTE_USER" --ingroup "$BASE_USERS_REMOTE_USER" --disabled-password --shell /bin/ash
 
-    mkdir -p /home/"$REMOTE_USER"
+    mkdir -p /home/"$BASE_USERS_REMOTE_USER"
 
-    alpine_change_pass "$REMOTE_USER" "$REMOTE_USER_PASSWORD"
+    alpine_change_pass "$BASE_USERS_REMOTE_USER" "$BASE_USERS_REMOTE_USER_PASSWORD"
 
-    alpine_sudoers "$REMOTE_USER"
+    alpine_sudoers "$BASE_USERS_REMOTE_USER"
 
     # adding home to lbu
-    lbu add /home/"$REMOTE_USER" "$REMOTE_USER"
+    lbu add /home/"$BASE_USERS_REMOTE_USER" "$BASE_USERS_REMOTE_USER"
 }
 
 alpine_change_pass() {
@@ -148,13 +157,13 @@ alpine_sudoers() {
 
 #===============================  e n v  v a r s  =============================#
 
-: "${AUTHORIZED_KEYS?Need to set AUTHORIZED_KEYS}"
+: "${BASE_SSH_AUTHORIZED_KEYS?Need to set BASE_SSH_AUTHORIZED_KEYS}"
 
 #=============================== s s h ========================================#
 
 alpine_setup_ssh() {
-    AUTHORIZED_KEYS=$1
-    REMOTE_USER=$2
+    BASE_SSH_AUTHORIZED_KEYS=$1
+    BASE_USERS_REMOTE_USER=$2
 
     sed -i 's/#ChallengeResponseAuthentication yes/ChallengeResponseAuthentication yes/' /etc/ssh/sshd_config
     sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin no/' /etc/ssh/sshd_config
@@ -165,18 +174,21 @@ alpine_setup_ssh() {
     cat <<EOF >>/etc/ssh/sshd_config
 
 AuthenticationMethods publickey,keyboard-interactive
-AllowUsers $REMOTE_USER
+AllowUsers $BASE_USERS_REMOTE_USER
 
 EOF
 
     # copy ssh keys
-    mkdir -p /home/"$REMOTE_USER"/.ssh
+    mkdir -p /home/"$BASE_USERS_REMOTE_USER"/.ssh
     #Print the split string
-    for AK in $AUTHORIZED_KEYS; do
-        echo "$AK" >/home/"$REMOTE_USER"/.ssh/authorized_keys
+    DELIMITER=", "
+    while test "${BASE_SSH_AUTHORIZED_KEYS#*$DELIMITER}" != "$BASE_SSH_AUTHORIZED_KEYS"; do
+        echo "${BASE_SSH_AUTHORIZED_KEYS%%$DELIMITER*}" >>/home/"$BASE_USERS_REMOTE_USER"/.ssh/authorized_keys
+        BASE_SSH_AUTHORIZED_KEYS="${BASE_SSH_AUTHORIZED_KEYS#*$DELIMITER}"
     done
+    echo "$BASE_SSH_AUTHORIZED_KEYS" >>/home/"$BASE_USERS_REMOTE_USER"/.ssh/authorized_keys
 
-    # generate ssh keys - NOT WORKING YET
+    # generate local ssh keys
     alpine_generate_ssh_keys
 }
 
@@ -244,14 +256,14 @@ mkdir -p /etc
 printf 'nameserver 8.8.8.8\nnameserver 2620:0:ccc::2' >/etc/resolv.conf
 
 alpine_setup_apkcache_config
-alpine_setup_hostname "$BUILD_HOSTNAME"
-alpine_setup_repositories "$ALPINE_MIRROR" "$ALPINE_BRANCH"
-alpine_setup_dns "$DNS"
+alpine_setup_hostname "$BASE_HOSTNAME"
+alpine_setup_repositories "$BASE_ALPINE_MIRROR" "$BASE_ALPINE_BRANCH"
+alpine_setup_dns "$BASE_NETWORKING_DNS_NAMESERVERS"
 alpine_setup_install_essentials
-alpine_setup_keymap "$KEYMAP"
-alpine_setup_timezone "$TIMEZONE"
+alpine_setup_keymap "$BASE_ALPINE_KEYMAP"
+alpine_setup_timezone "$BASE_ALPINE_TIMEZONE"
 alpine_setup_networking
 alpine_setup_reinstall_pkg_boot
 alpine_setup_initd
-alpine_setup_user "$ROOT_PASSWORD" "$REMOTE_USER" "$REMOTE_USER_PASSWORD"
-alpine_setup_ssh "$AUTHORIZED_KEYS" "$REMOTE_USER"
+alpine_setup_user "$BASE_USERS_ROOT_PASSWORD" "$BASE_USERS_REMOTE_USER" "$BASE_USERS_REMOTE_USER_PASSWORD"
+alpine_setup_ssh "$BASE_SSH_AUTHORIZED_KEYS" "$BASE_USERS_REMOTE_USER"

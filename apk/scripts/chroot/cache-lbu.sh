@@ -5,8 +5,8 @@ set -eu
 #=================================== l b u ====================================#
 
 alpine_setup_lbu_commit() {
-    mkdir -p /target/
-    lbu pkg /target/alpine.apkovl.tar.gz
+    mkdir -p /config
+    lbu pkg /config/alpine.apkovl.tar.gz
 }
 
 alpine_setup_apkcache_sync() {
@@ -19,6 +19,11 @@ alpine_setup_apkcache_sync() {
 
     # adding the first ext4 partition to the fstab, to have the var cache at startup
     echo "/dev/mmcblk0p2 /media/mmcblk0p2 ext4 rw,relatime 0 0" >>/etc/fstab
+
+    tar czf \
+        /config/alpine.apkcache.tar.gz \
+        -C /var/cache/apk \
+        .
 }
 
 #==============================================================================#
