@@ -1,0 +1,32 @@
+FROM debian:buster-slim
+
+RUN apt-get update && apt-get install -y \
+    wget binfmt-support qemu-user-static ssh
+
+COPY ./apk/scripts /apk/scripts
+COPY ./apk/build.sh /apk/build.sh
+COPY ./scripts /scripts
+
+# Output dir and config dir
+VOLUME ["/apk/config/"]
+
+# Additional provisioners build
+VOLUME ["/apk/additional_provisioners"]
+
+ENTRYPOINT ["/apk/build.sh", "-c", "/apk/config/config.env", "-a", "/apk/additional_provisioners"]
+
+CMD ["/bin/bash"]
+
+# docker build -t vincentserpoul/funicular-apk ./ -f ./DockerfileApk
+
+# docker run -it --name apk-build --rm --privileged \
+#     --mount type=bind,source="$(pwd)"/example/pleine-lune-rpi3b+,target=/apk/config \
+#     --mount type=bind,source="$(pwd)"/example/pleine-lune-rpi3b+/provisioners,target=/apk/additional_provisioners,readonly \
+#     vincentserpoul/funicular-apk
+
+# For rpi0, as an example:
+# docker run --privileged --rm -v /dev:/dev:ro \
+#     -e ARCH="armhf" \
+#     -e BUILD_HOSTNAME="test-rpi0-2" \
+#     -e NETWORKING="2" \
+#     -t vincentserpoul/alpine-diskless-headless

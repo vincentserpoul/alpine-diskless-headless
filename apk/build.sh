@@ -105,15 +105,17 @@ apk-tools-install "$ROOTFS_DIRECTORY" "$BASE_ARCH" "$BASE_ALPINE_MIRROR" "$BASE_
 
 alpine-setup-prepare "$ROOTFS_DIRECTORY" "$CONFIG_DIR"
 
-if [[ -n ${ADDITIONAL_PROVISIONERS+x} ]]; then
-    additional-provisioners-copy "$ROOTFS_DIRECTORY" "$ADDITIONAL_PROVISIONERS"
-fi
-
 einfo "installing base alpine"
 
 chroot "$ROOTFS_DIRECTORY" /bin/sh -c "set -a && . /config/config.env && set +a && /install-scripts/base.sh"
 
+#==========================  p r o v i s i o n e r s  =========================#
+
 einfo "installing provisioners $PROVISIONERS"
+
+if [[ -n ${ADDITIONAL_PROVISIONERS+x} ]]; then
+    additional-provisioners-copy "$ROOTFS_DIRECTORY" "$ADDITIONAL_PROVISIONERS"
+fi
 
 # loop through provisioners
 for PROV in $PROVISIONERS; do
