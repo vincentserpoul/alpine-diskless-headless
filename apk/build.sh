@@ -106,7 +106,6 @@ apk-tools-install "$ROOTFS_DIRECTORY" "$BASE_ARCH" "$BASE_ALPINE_MIRROR" "$BASE_
 alpine-setup-prepare "$ROOTFS_DIRECTORY" "$CONFIG_DIR"
 
 if [[ -n ${ADDITIONAL_PROVISIONERS+x} ]]; then
-    einfo "copying additional provisioners present in folder $ADDITIONAL_PROVISIONERS"
     additional-provisioners-copy "$ROOTFS_DIRECTORY" "$ADDITIONAL_PROVISIONERS"
 fi
 
