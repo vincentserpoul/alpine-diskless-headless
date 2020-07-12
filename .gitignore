@@ -1,3 +1,5 @@
 downloads/
 mnt/
 machine/
+*.apkcache.*
+*.apkovl.*

@@ -21,14 +21,17 @@ if [[ ! -d "$BUILD_DIR" ]]; then BUILD_DIR="$PWD"; fi
 . """$BUILD_DIR""/scripts/apk-tools.sh"
 # shellcheck source=/dev/null
 . """$BUILD_DIR""/scripts/alpine-setup.sh"
+# shellcheck source=/dev/null
+. """$BUILD_DIR""/scripts/additional-provisioners.sh"
 
 #===================================  M a i n  ================================#
 
 #===================================  M e n u  ================================#
 
-while getopts 'c:h' OPTION; do
+while getopts 'c:a:h' OPTION; do
     case "$OPTION" in
     c) CONFIG_FILE_PATH="$OPTARG" ;;
+    a) ADDITIONAL_PROVISIONERS="$OPTARG" ;;
     h)
         echo "alpine-diskless-headless-apk-build v""$VERSION"""
         exit 0
@@ -102,22 +105,27 @@ apk-tools-install "$ROOTFS_DIRECTORY" "$BASE_ARCH" "$BASE_ALPINE_MIRROR" "$BASE_
 
 alpine-setup-prepare "$ROOTFS_DIRECTORY" "$CONFIG_DIR"
 
+if [[ -n ${ADDITIONAL_PROVISIONERS+x} ]]; then
+    einfo "copying additional provisioners present in folder $ADDITIONAL_PROVISIONERS"
+    additional-provisioners-copy "$ROOTFS_DIRECTORY" "$ADDITIONAL_PROVISIONERS"
+fi
+
 einfo "installing base alpine"
 
-chroot "$ROOTFS_DIRECTORY" /bin/sh -c "set -a && . /config/config.env && set +a && /chroot/base.sh"
+chroot "$ROOTFS_DIRECTORY" /bin/sh -c "set -a && . /config/config.env && set +a && /install-scripts/base.sh"
 
 einfo "installing provisioners $PROVISIONERS"
 
 # loop through provisioners
 for PROV in $PROVISIONERS; do
     einfo "installing provisioner $PROV"
-    chroot "$ROOTFS_DIRECTORY" /bin/sh -c "set -a && . /config/config.env && set +a && /chroot/provisioners/$PROV.sh"
+    chroot "$ROOTFS_DIRECTORY" /bin/sh -c "set -a && . /config/config.env && set +a && /install-scripts/provisioners/$PROV.sh"
 done
 
 einfo "saving cache and lbu"
 
 # Save lbu and apk cache
-chroot "$ROOTFS_DIRECTORY" /chroot/cache-lbu.sh
+chroot "$ROOTFS_DIRECTORY" /install-scripts/cache-lbu.sh
 
 # Move lbu and apk cache outside of rootfs
 alpine-setup-backup "$ROOTFS_DIRECTORY" "$CONFIG_DIR"

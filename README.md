@@ -105,6 +105,7 @@ Then, we ll create a proper command cli, in order to handle configuration a bit 
 # TODO
 
 - [ ] use docker
+- [ ] try fakechroot
 - [ ] encrypt lbu
 - [ ] switch to rust or go cli
 - [ ] encrypt secrets (using [age](https://github.com/FiloSottile/age) or [sops](https://github.com/mozilla/sops) )
