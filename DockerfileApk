@@ -24,13 +24,9 @@ CMD ["/bin/bash"]
 
 # docker run -it --name apk-build --rm --privileged \
 #     --mount type=bind,source="$(pwd)"/example/pleine-lune-rpi3b+,target=/apk/config \
+#     --mount type=bind,source="$(pwd)"/example/pleine-lune-rpi3b+/target,target=/target \
 #     --mount type=bind,source="$(pwd)"/example/pleine-lune-rpi3b+/provisioners,target=/apk/additional_provisioners,readonly \
 #     vincentserpoul/funicular-apk
-
-
-
-
-
 
 
 # For rpi0, as an example:
