@@ -34,8 +34,8 @@ alpine-setup-prepare() {
 
 alpine-setup-backup() {
     local -r ROOTFS_DIR=$1
-    local -r LOCAL_CONFIG_DIR=$2
+    local -r TARGET_DIR=$2
 
-    mv "$ROOTFS_DIR"/config/alpine.apkovl.tar.gz "$LOCAL_CONFIG_DIR"/
-    mv "$ROOTFS_DIR"/config/alpine.apkcache.tar.gz "$LOCAL_CONFIG_DIR"/
+    mv "$ROOTFS_DIR"/target/alpine.apkovl.tar.gz "$TARGET_DIR"/
+    mv "$ROOTFS_DIR"/target/alpine.apkcache.tar.gz "$TARGET_DIR"/
 }

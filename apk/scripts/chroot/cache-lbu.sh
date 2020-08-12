@@ -5,11 +5,13 @@ set -eu
 #=================================== l b u ====================================#
 
 alpine_setup_lbu_commit() {
-    mkdir -p /config
-    lbu pkg /config/alpine.apkovl.tar.gz
+    mkdir -p /target
+    lbu pkg /target/alpine.apkovl.tar.gz
 }
 
 alpine_setup_apkcache_sync() {
+    mkdir -p /target
+
     # fetching all deps in the apk cache
     apk cache sync
 
@@ -21,7 +23,7 @@ alpine_setup_apkcache_sync() {
     echo "/dev/mmcblk0p2 /media/mmcblk0p2 ext4 rw,relatime 0 0" >>/etc/fstab
 
     tar czf \
-        /config/alpine.apkcache.tar.gz \
+        /target/alpine.apkcache.tar.gz \
         -C /var/cache/apk \
         .
 }

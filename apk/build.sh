@@ -28,10 +28,11 @@ if [[ ! -d "$BUILD_DIR" ]]; then BUILD_DIR="$PWD"; fi
 
 #===================================  M e n u  ================================#
 
-while getopts 'c:a:h' OPTION; do
+while getopts 'c:a:t:h' OPTION; do
     case "$OPTION" in
     c) CONFIG_FILE_PATH="$OPTARG" ;;
     a) ADDITIONAL_PROVISIONERS="$OPTARG" ;;
+    t) TARGET_DIR="$OPTARG" ;;
     h)
         echo "alpine-diskless-headless-apk-build v""$VERSION"""
         exit 0
@@ -79,6 +80,17 @@ readonly CONFIG_DIR=$(dirname "$CONFIG_FILE_PATH")
 # check if hostname is filled
 helpers-base-hostname-check
 
+#=============================  t a r g e t  d i r  ===========================#
+
+einfo "checking target dir"
+
+if [[ -z ${TARGET_DIR+x} ]]; then
+    TARGET_DIR="$CONFIG_DIR"
+fi
+if [[ ! -d "$TARGET_DIR" ]]; then
+    die "$TARGET_DIR is not a dir"
+fi
+
 #===============================  r o o t f s   ===============================#
 
 einfo "preparing rootfs"
@@ -89,7 +101,7 @@ if [[ -z ${ROOTFS_DIRECTORY+x} ]]; then
 fi
 rootfs-unmount-all "$ROOTFS_DIRECTORY"
 rm -rf "$ROOTFS_DIRECTORY"
-mkdir "$ROOTFS_DIRECTORY"
+mkdir -p "$ROOTFS_DIRECTORY"
 
 #===============================  a p k o v l   ===============================#
 
@@ -129,7 +141,7 @@ einfo "saving cache and lbu"
 chroot "$ROOTFS_DIRECTORY" /install-scripts/cache-lbu.sh
 
 # Move lbu and apk cache outside of rootfs
-alpine-setup-backup "$ROOTFS_DIRECTORY" "$CONFIG_DIR"
+alpine-setup-backup "$ROOTFS_DIRECTORY" "$TARGET_DIR"
 
 #==============================  t e a r d o w n  =============================#
 
