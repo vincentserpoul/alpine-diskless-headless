@@ -12,7 +12,7 @@ BUILD_DIR="${BASH_SOURCE%/*}"
 if [[ ! -d "$BUILD_DIR" ]]; then BUILD_DIR="$PWD"; fi
 
 # shellcheck source=/dev/null
-. """$BUILD_DIR""/../scripts/utils.sh"
+. """$BUILD_DIR""/../../scripts/utils.sh"
 # shellcheck source=/dev/null
 . """$BUILD_DIR""/scripts/alpine.sh"
 # shellcheck source=/dev/null
@@ -22,11 +22,12 @@ if [[ ! -d "$BUILD_DIR" ]]; then BUILD_DIR="$PWD"; fi
 
 #===================================  M e n u  ================================#
 
-while getopts 'c:h' OPTION; do
+while getopts 'c:t:h' OPTION; do
     case "$OPTION" in
     c) CONFIG_FILE_PATH="$OPTARG" ;;
+    t) TARGET_DIR="$OPTARG" ;;
     h)
-        echo "alpine-diskless-headless-apk-build v""$VERSION"""
+        echo "alpine-diskless-headless-hw-rpi-build v""$VERSION"""
         exit 0
         ;;
     *)
@@ -55,8 +56,21 @@ CONFIG_FILE_PATH="$(cd "$(dirname "$CONFIG_FILE_PATH")" && pwd)/$(basename "$CON
 # shellcheck source=/dev/null
 . "$CONFIG_FILE_PATH"
 
+readonly CONFIG_DIR=$(dirname "$CONFIG_FILE_PATH")
+
 # check if hostname is filled
 helpers-base-hostname-check
+
+#=============================  t a r g e t  d i r  ===========================#
+
+einfo "checking target dir"
+
+if [[ -z ${TARGET_DIR+x} ]]; then
+    TARGET_DIR="$CONFIG_DIR"
+fi
+if [[ ! -d "$TARGET_DIR" ]]; then
+    die "$TARGET_DIR is not a dir"
+fi
 
 #===================================  M a i n  ================================#
 
@@ -68,4 +82,4 @@ alpine-download "$BASE_ARCH" "$BASE_ALPINE_MIRROR" "$BASE_ALPINE_BRANCH" "$BASE_
 
 alpine-extract "$BASE_ARCH" "$BASE_ALPINE_VERSION"
 
-boot-update "$BASE_ARCH" "$BASE_ALPINE_VERSION"
+boot-update "$TARGET_DIR" "$BASE_ARCH" "$BASE_ALPINE_VERSION"

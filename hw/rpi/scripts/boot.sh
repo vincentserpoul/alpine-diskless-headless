@@ -12,9 +12,9 @@ if [[ ! -d "$DIR_BOOT" ]]; then DIR_BOOT="$PWD"; fi
 # shellcheck source=/dev/null
 . """$DIR_ALPINE""/helpers.sh"
 # shellcheck source=/dev/null
-. """$DIR_BOOT""/../../scripts/utils.sh"
+. """$DIR_BOOT""/../../../scripts/utils.sh"
 # shellcheck source=/dev/null
-. """$DIR_ALPINE""/../../scripts/helpers.sh"
+. """$DIR_ALPINE""/../../../scripts/helpers.sh"
 
 #================================  b o o t  ===================================#
 
@@ -45,13 +45,13 @@ EOF
 
 boot-compress() {
     local -r WORK_DIR=$1
-    local -r ARCH=$2
-    local -r ALPINE_VERSION=$3
+    local -r TARGET_DIR=$2
 
     einfo "compressing the alpine boot"
 
     mkdir -p "$DIR_BOOT"/../boot
-    tar czf "$(helpers-hardware-filepath-get "rpi" "$ARCH" "$ALPINE_VERSION")" -C "$WORK_DIR" .
+    mkdir -p "$TARGET_DIR"
+    tar czf "$TARGET_DIR"/alpine.boot.tar.gz -C "$WORK_DIR" .
 }
 
 #==============================================================================#
@@ -59,14 +59,15 @@ boot-compress() {
 #==============================================================================#
 
 boot-update() {
-    local -r ARCH=$1
-    local -r ALPINE_VERSION=$2
+    local -r TARGET_DIR=$1
+    local -r ARCH=$2
+    local -r ALPINE_VERSION=$3
 
     local -r WORK_DIR="$(helpers-workdir-name-get """$ARCH""" """$ALPINE_VERSION""")"
 
     boot-cmdline "$WORK_DIR"
     boot-usercfg "$WORK_DIR"
-    boot-compress "$WORK_DIR" "$ARCH" "$ALPINE_VERSION"
+    boot-compress "$WORK_DIR" "$TARGET_DIR"
 
     rm -rf "$WORK_DIR"
 }

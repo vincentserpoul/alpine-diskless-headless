@@ -12,9 +12,9 @@ if [[ ! -d "$DIR_ALPINE" ]]; then DIR_ALPINE="$PWD"; fi
 # shellcheck source=/dev/null
 . """$DIR_ALPINE""/helpers.sh"
 # shellcheck source=/dev/null
-. """$DIR_ALPINE""/../../scripts/utils.sh"
+. """$DIR_ALPINE""/../../../scripts/utils.sh"
 # shellcheck source=/dev/null
-. """$DIR_ALPINE""/../../scripts/helpers.sh"
+. """$DIR_ALPINE""/../../../scripts/helpers.sh"
 
 #============================== d o w n l o a d ===============================#
 

@@ -1,0 +1,26 @@
+FROM debian:buster-slim
+
+RUN apt-get update && apt-get install -y \
+    wget binfmt-support qemu-user-static ssh
+
+COPY ./hw/rpi/scripts /hw/rpi/scripts
+COPY ./hw/rpi/build.sh /hw/rpi/build.sh
+COPY ./hw/build.sh /hw/build.sh
+COPY ./scripts /scripts
+
+# config dir
+VOLUME ["/config/"]
+
+#target dir
+VOLUME ["/target/"]
+
+ENTRYPOINT ["/hw/build.sh", "-c", "/config/config.env", "-t", "/target"]
+
+CMD ["/bin/bash"]
+
+# docker build -t vincentserpoul/funicular-hw ./ -f ./DockerfileHw
+
+# docker run -it --name hw-build --rm --privileged \
+#     --mount type=bind,source="$(pwd)"/example/pleine-lune-rpi3b+,target=/config \
+#     --mount type=bind,source="$(pwd)"/example/pleine-lune-rpi3b+/target,target=/target \
+#     vincentserpoul/funicular-hw
