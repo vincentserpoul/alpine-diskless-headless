@@ -20,10 +20,11 @@ if [[ ! -d "$BUILD_HW_DIR" ]]; then BUILD_HW_DIR="$PWD"; fi
 
 #===================================  M e n u  ================================#
 
-while getopts 'c:t:h' OPTION; do
+while getopts 'c:t:w:h' OPTION; do
     case "$OPTION" in
     c) CONFIG_FILE_PATH="$OPTARG" ;;
     t) TARGET_DIR="$OPTARG" ;;
+    w) TARGET_HW="$OPTARG" ;;
     h)
         echo "alpine-diskless-headless-hw-build v""$VERSION"""
         exit 0
@@ -72,18 +73,15 @@ fi
 
 #================================  h a r d w a r e  ===========================#
 
-einfo "checking hardware type"
+einfo "checking target hardware"
 
-if [[ -z ${BASE_HW+x} ]]; then
-    einfo "picking raspberry pi by default"
-    BASE_HW="rpi"
+if [[ -z ${TARGET_HW+x} ]]; then
+    die "no hardware specified"
 fi
-if [[ ! -d "$BUILD_HW_DIR/$BASE_HW" ]]; then
-    die "$BUILD_HW_DIR/$BASE_HW is not a dir"
+if [[ ! -d "$BUILD_HW_DIR/$TARGET_HW" ]]; then
+    die "$BUILD_HW_DIR/$TARGET_HW is not a dir"
 fi
 
 #===================================  M a i n  ================================#
 
-# root-check
-
-./"$BUILD_HW_DIR"/"$BASE_HW"/build.sh -c "$CONFIG_FILE_PATH" -t "$TARGET_DIR"
+./"$BUILD_HW_DIR"/"$TARGET_HW"/build.sh -c "$CONFIG_FILE_PATH" -t "$TARGET_DIR"

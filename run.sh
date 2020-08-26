@@ -50,21 +50,21 @@ if [[ ! -d "$DIR_BASE" ]]; then DIR_BASE="$PWD"; fi
 . """$DIR_BASE""/scripts/utils.sh"
 # shellcheck source=/dev/null
 . """$DIR_BASE""/scripts/helpers.sh"
-# shellcheck source=/dev/null
-. """$DIR_BASE""/scripts/dev.sh"
 
 #===================================  M a i n  ================================#
 
 #===================================  M e n u  ================================#
 
-while getopts 'r:d:c:fh' OPTION; do
+while getopts 'c:a:t:w:d:fh' OPTION; do
     case "$OPTION" in
-    r) HARDWARE="$OPTARG" ;;
-    d) DEVICE_NAME="$OPTARG" ;;
     c) CONFIG_FILE_PATH="$OPTARG" ;;
+    a) ADDITIONAL_PROVISIONERS="$OPTARG" ;;
+    t) TARGET_DIR="$OPTARG" ;;
+    w) TARGET_HW="$OPTARG" ;;
+    d) DEVICE_NAME="$OPTARG" ;;
     f) FORCE_DEV_WRITE=true ;;
     h)
-        echo "alpine-diskless-headless-apk-build v""$VERSION"""
+        echo "alpine-diskless-headless-run v""$VERSION"""
         exit 0
         ;;
     *)
@@ -73,34 +73,6 @@ while getopts 'r:d:c:fh' OPTION; do
         ;;
     esac
 done
-
-# default vars
-: "${HARDWARE:="rpi"}"
-: "${FORCE_DEV_WRITE:=false}"
-
-#================================  c o n f i g  ===============================#
-
-einfo "checking config"
-
-# check if config is present
-if [[ -z ${CONFIG_FILE_PATH+x} ]]; then
-    die "you need to supply a config path -c <CONFIG_FILE_PATH>"
-fi
-if [[ ! -f "$CONFIG_FILE_PATH" ]]; then
-    die "the config path you supplied is not valid"
-fi
-
-# turn relative into absolute
-CONFIG_FILE_PATH="$(cd "$(dirname "$CONFIG_FILE_PATH")" && pwd)/$(basename "$CONFIG_FILE_PATH")"
-
-# Load the config
-# shellcheck source=/dev/null
-. "$CONFIG_FILE_PATH"
-
-readonly CONFIG_DIR=$(dirname "$CONFIG_FILE_PATH")
-
-# check if hostname is filled
-helpers-base-hostname-check
 
 #===================================  M a i n  ================================#
 
@@ -114,36 +86,26 @@ fi
 einfo "running alpine-diskless-headless-run"
 
 # apk
-"$DIR_BASE"/apk/build.sh -c "$CONFIG_FILE_PATH"
+"$DIR_BASE"/apk/build.sh -c "$CONFIG_FILE_PATH" -a "$ADDITIONAL_PROVISIONERS" -t "$TARGET_DIR"
 
-# hardware boot
-"$DIR_BASE"/"$HARDWARE"/build.sh -c "$CONFIG_FILE_PATH"
-
-# /dev/sda partition, mount, copy files, umount
-if [ "$FORCE_DEV_WRITE" == false ]; then
-    echo
-    read -p "Are you sure you want to format ""$DEVICE_NAME"" (Y/y)?" -n 1 -r
-    echo
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        die "script stopped by user"
-    fi
+# if hardware not specified, we don't continue
+if [[ -z ${TARGET_HW+x} ]]; then
+    einfo "finished successfully!"
+    exit 0
 fi
 
-dev-partition-full "$DEVICE_NAME"
+# hardware boot
+"$DIR_BASE"/hw/build.sh -c "$CONFIG_FILE_PATH" -t "$TARGET_DIR" -w "$TARGET_HW"
 
-readonly BOOT_MOUNT_POINT="$(dev-boot-mount "$DEVICE_NAME")"
-einfo "copying boot files and local backup to boot partition"
-tar xzf "$(helpers-hardware-filepath-get "$HARDWARE" "$BASE_ARCH" "$BASE_ALPINE_VERSION")" --no-same-owner -C "$BOOT_MOUNT_POINT"
-cp "$CONFIG_DIR"/alpine.apkovl.tar.gz "$BOOT_MOUNT_POINT"
-dev-boot-umount "$DEVICE_NAME"
+# if hardware not specified, we don't continue
+if [[ -z ${DEVICE_NAME+x} ]]; then
+    einfo "finished successfully!"
+    exit 0
+fi
 
-readonly DISK_MOUNT_POINT="$(dev-disk-mount "$DEVICE_NAME")"
-einfo "extracting apk cache to main ext4 partition"
-mkdir -p "$DISK_MOUNT_POINT"/var/cache/apk
-tar xzf "$CONFIG_DIR"/alpine.apkcache.tar.gz -C "$DISK_MOUNT_POINT"/var/cache/apk
-dev-disk-umount "$DEVICE_NAME"
+"$DIR_BASE"/dev/run.sh -s "$TARGET_DIR" -d "$DEVICE_NAME" -f "$FORCE_DEV_WRITE"
 
 einfo "finished successfully!"
 echo
 ewarn "to connect to your SBC, just put the sdcard in it, wait for it to boot and run:"
-ewarn "ssh -i YOURSSHKEY maintenance@$BASE_HOSTNAME"
+ewarn "ssh -i <YOURSSHKEY> $BASE_USERS_REMOTE_USER@$BASE_HOSTNAME"
