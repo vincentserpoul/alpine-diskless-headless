@@ -107,7 +107,9 @@ mkdir -p "$ROOTFS_DIRECTORY"
 
 einfo "extracting and installing apk tools"
 
-apk-tools-downloadx "$BASE_ARCH" "$BASE_ALPINE_MIRROR" "$BASE_ALPINE_BRANCH" "$BUILD_DIR/downloads"
+apk-tools-download "$BASE_ARCH" "$BASE_ALPINE_MIRROR" "$BASE_ALPINE_BRANCH" "$BUILD_DIR/downloads"
+
+apk-tools-extract "$BASE_ARCH" "$BASE_ALPINE_MIRROR" "$BASE_ALPINE_BRANCH" "$BUILD_DIR/downloads"
 
 rootfs-mount-all "$ROOTFS_DIRECTORY"
 

@@ -1,9 +1,4 @@
-rootfs/
-downloads/
-secrets/
 apk-tools-static/
 apkovl/
-imgs/
-machine/
-add-prov
-additional-provisioners
+downloads/
+rootfs/

@@ -31,7 +31,7 @@ alpine-download() {
     local -r FILE_NAME="$(helpers-download-tar-name-get """$ARCH""" """$ALPINE_VERSION""")"
     local -r FILE_PATH="$(helpers-download-filepath-get "$ARCH" "$ALPINE_VERSION")"
 
-    einfo "dowloading rpi alpine ""$ALPINE_VERSION"" for ""$ARCH"""
+    einfo "downloading rpi alpine ""$ALPINE_VERSION"" for ""$ARCH"""
 
     if [ ! -f "$FILE_PATH" ]; then
         mkdir -p "$FILE_DIR"

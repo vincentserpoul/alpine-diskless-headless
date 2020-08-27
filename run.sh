@@ -103,9 +103,9 @@ if [[ -z ${DEVICE_NAME+x} ]]; then
     exit 0
 fi
 
-"$DIR_BASE"/dev/run.sh -s "$TARGET_DIR" -d "$DEVICE_NAME" -f "$FORCE_DEV_WRITE"
+"$DIR_BASE"/device/run.sh -s "$TARGET_DIR" -d "$DEVICE_NAME" -f "$FORCE_DEV_WRITE"
 
 einfo "finished successfully!"
 echo
 ewarn "to connect to your SBC, just put the sdcard in it, wait for it to boot and run:"
-ewarn "ssh -i <YOURSSHKEY> $BASE_USERS_REMOTE_USER@$BASE_HOSTNAME"
+ewarn "ssh -i <YOURSSHKEY> <REMOTE_USER>@<HOSTNAME>"

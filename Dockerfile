@@ -1,21 +1,33 @@
 FROM debian:buster-slim
 
-RUN apt-get update && apt-get install -y \
-    wget binfmt-support qemu-user-static ssh parted
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y \
+    wget \
+    binfmt-support qemu-user-static ssh \
+    parted dosfstools
 
-COPY ./apk/scripts /apk/scripts
-COPY ./apk/build.sh /apk/build.sh
-
-COPY ./hw/rpi/scripts /hw/rpi/scripts
-COPY ./hw/rpi/build.sh /hw/rpi/build.sh
-COPY ./hw/build.sh /hw/build.sh
-
-COPY ./dev/scripts /dev/scripts
-COPY ./dev/run.sh /dev/run.sh
+# cache common downloads
+COPY ./hw/rpi/predownload.sh /hw/rpi/predownload.sh
+RUN /hw/rpi/predownload.sh
 
 COPY ./scripts /scripts
 
 COPY ./run.sh /run.sh
+
+COPY ./apk/scripts /apk/scripts
+COPY ./apk/build.sh /apk/build.sh
+COPY ./apk/predownload.sh /apk/predownload.sh
+
+# cache common downloads
+RUN /apk/predownload.sh
+
+COPY ./hw/rpi/scripts /hw/rpi/scripts
+COPY ./hw/rpi/build.sh /hw/rpi/build.sh
+
+COPY ./hw/build.sh /hw/build.sh
+
+COPY ./device/scripts /device/scripts
+COPY ./device/run.sh /device/run.sh
 
 # config dir
 VOLUME ["/apk/config/"]

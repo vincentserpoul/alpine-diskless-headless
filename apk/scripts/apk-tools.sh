@@ -26,7 +26,7 @@ apk-tools-latest-version-get() {
     wget -qO- "$LIST_URL" | grep apk-tools-static- | sed -n 's/.*href="\(.*\)".*/\1/p'
 }
 
-apk-tools-downloadx() {
+apk-tools-download() {
     local -r ARCH=$1
     local -r ALPINE_MIRROR=$2
     local -r ALPINE_BRANCH=$3
@@ -38,7 +38,7 @@ apk-tools-downloadx() {
 
     local -r FILE_PATH="""$FILE_DIR""/""$ARCH""-""$FILE_NAME"""
 
-    einfo "dowloading apk static tools"
+    einfo "downloading apk static tools for $ARCH"
 
     dep-check wget
 
@@ -46,6 +46,19 @@ apk-tools-downloadx() {
         mkdir -p "$FILE_DIR"
         wget "$LIST_URL"/"$FILE_NAME" -O "$FILE_PATH"
     fi
+}
+
+apk-tools-extract() {
+    local -r ARCH=$1
+    local -r ALPINE_MIRROR=$2
+    local -r ALPINE_BRANCH=$3
+    local -r FILE_DIR=$4
+
+    local -r LIST_URL="$ALPINE_MIRROR"/"$ALPINE_BRANCH"/main/"$ARCH"
+
+    local -r FILE_NAME="$(apk-tools-latest-version-get "$LIST_URL")"
+
+    local -r FILE_PATH="""$FILE_DIR""/""$ARCH""-""$FILE_NAME"""
 
     local -r XTRACT_DIR="$DIR_APK_TOOLS"/../apk-tools-static
 
