@@ -18,9 +18,28 @@ Once booted, you should be able to ssh into it (see examples below).
 - ssh only with ssh key and, if you add the provider, 2fa
 - to be further secured
 
-## Using it
+## using it with docker
+
+```bash
+docker run -it --name funicular-apk-build --rm --privileged \
+    --mount type=bind,source="$(pwd)"/example/pleine-lune-rpi3b+,target=/apk/config \
+    --mount type=bind,source="$(pwd)"/example/pleine-lune-rpi3b+/target,target=/target \
+    --mount type=bind,source="$(pwd)"/example/pleine-lune-rpi3b+/provisioners,target=/apk/additional_provisioners,readonly \
+    --device /dev/sda \
+    vincentserpoul/funicular -w rpi -d /dev/sda -f
+```
+
+### building it
+
+```bash
+docker build -t vincentserpoul/funicular ./ -f ./Dockerfile
+```
+
+## Using it without docker
 
 ```
+#!/usr/bin/env bash
+#---help---
 # Usage: ./run.sh [options]
 #
 # The goal of this script is to create a diskless, headless install of alpine
@@ -28,32 +47,39 @@ Once booted, you should be able to ssh into it (see examples below).
 #
 # Just insert a sdcard and run it with the right parameters.
 #
-# It has a few dependencies: qemu-user-static, chroot, parted.
+# It has a few dependencies: wget, binfmt-support, qemu-user-static, ssh, parted, dosfstools
 #
 # Example:
-#   sudo sudo ./run.sh -d rpi -f
+#   sudo ./run.sh -c "$(pwd)"/example/pleine-lune-rpi3b+/config.env -t "$(pwd)"/example/pleine-lune-rpi3b+/target -w rpi -d /dev/sda -f
 #
 # Options and environment variables:
 #
-#   -r HARDWARE            which SMB you are targeting.
-#                          Options: rpi
-#                          Default: rpi
+#   -c CONFIG_FILE_PATH         path of the config.env file
 #
-#   -d DEVICE_NAME         Name of the device to write to.
-#                          Default: /dev/sda
+#   -a ADDITIONAL_PROVISIONERS  path of the folder containing additional provisioner scripts
+#                               Default: empty
 #
-#   -c CONFIG_FILE_PATH    path of the config.env file
+#   -t TARGET_DIR               dir where tar.gz will be created
+#                               Default: config dir
 #
-#   -f FORCE_DEV_WRITE     If true, don't ask before writing to the device.
-#                          Default: false
+#   -w TARGET_HW                which SMB you are targeting.
+#                               Options: rpi
+#                               Default: rpi
 #
-#   -h                     Show this help message and exit.
+#   -d DEVICE_NAME              name of the device to write to. for example /dev/sda
+#                               Default: empty
+#
+#   -f FORCE_DEV_WRITE          if true, don't ask before writing to the device.
+#                               Default: false
+#
+#   -h                          show this help message and exit.
 #
 # Each option can be also provided by environment variable. If both option and
 # variable is specified and the option accepts only one argument, then the
 # option takes precedence.
 #
 # https://github.com/vincentserpoul/alpine-diskless-headless
+#---help---
 ```
 
 ## Examples
@@ -65,7 +91,7 @@ You have a rpi3B+, you want to set it with a hostname "pleine-lune" and want to 
 modify accordingly and run
 
 ```bash
-sudo ./run.sh -c ./example/pleine-lune-rpi3b+/config.env -d /dev/sda
+sudo ./run.sh -c "$(pwd)"/example/pleine-lune-rpi3b+/config.env -t "$(pwd)"/example/pleine-lune-rpi3b+/target -w rpi -d /dev/sda -f
 ```
 
 ### rpi0
@@ -75,7 +101,7 @@ You have a rpi0, you want to set it with a hostname "pleine-lune" and can only u
 modify accordingly and run
 
 ```bash
-sudo ./run.sh -c ./example/pleine-lune-rpi0/config.env -d /dev/sda
+sudo ./run.sh -c "$(pwd)"/example/pleine-lune-rpi0/config.env -t "$(pwd)"/example/pleine-lune-rpi0/target -w rpi -d /dev/sda -f
 ```
 
 ### Accessing the rpi
@@ -104,10 +130,10 @@ Then, we ll create a proper command cli, in order to handle configuration a bit 
 
 # TODO
 
-- [ ] use docker
+- [x] use docker
 - [ ] try fakechroot
 - [ ] encrypt lbu
-- [ ] switch to rust or go cli
+- [x] use a rust cli (see vincentserpoul/funicular)
 - [ ] encrypt secrets (using [age](https://github.com/FiloSottile/age) or [sops](https://github.com/mozilla/sops) )
 - [ ] [ufw](https://wiki.alpinelinux.org/wiki/Uncomplicated_Firewall)
 

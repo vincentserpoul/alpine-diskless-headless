@@ -7,26 +7,32 @@
 #
 # Just insert a sdcard and run it with the right parameters.
 #
-# It has a few dependencies: qemu-user-static, chroot, parted.
+# It has a few dependencies: wget, binfmt-support, qemu-user-static, ssh, parted, dosfstools
 #
 # Example:
-#   sudo sudo ./run.sh -d rpi -f
+#   sudo ./run.sh -c "$(pwd)"/example/pleine-lune-rpi3b+/config.env -t "$(pwd)"/example/pleine-lune-rpi3b+/target -w rpi -d /dev/sda -f
 #
 # Options and environment variables:
 #
-#   -c CONFIG_FILE_PATH    path of the config.env file
+#   -c CONFIG_FILE_PATH         path of the config.env file
 #
-#   -d DEVICE_NAME         Name of the device to write to. for example /dev/sda
-#                          Default: no default, must be filled
+#   -a ADDITIONAL_PROVISIONERS  path of the folder containing additional provisioner scripts
+#                               Default: empty
 #
-#   -r HARDWARE            which SMB you are targeting.
-#                          Options: rpi
-#                          Default: rpi
+#   -t TARGET_DIR               dir where tar.gz will be created
+#                               Default: config dir
 #
-#   -f FORCE_DEV_WRITE     If true, don't ask before writing to the device.
-#                          Default: false
+#   -w TARGET_HW                which SMB you are targeting.
+#                               Options: rpi
+#                               Default: rpi
 #
-#   -h                     Show this help message and exit.
+#   -d DEVICE_NAME              name of the device to write to. for example /dev/sda
+#                               Default: empty
+#
+#   -f FORCE_DEV_WRITE          if true, don't ask before writing to the device.
+#                               Default: false
+#
+#   -h                          show this help message and exit.
 #
 # Each option can be also provided by environment variable. If both option and
 # variable is specified and the option accepts only one argument, then the
@@ -65,6 +71,8 @@ while getopts 'c:a:t:w:d:fh' OPTION; do
     f) FORCE_DEV_WRITE=true ;;
     h)
         echo "alpine-diskless-headless-run v""$VERSION"""
+        echo
+        usage
         exit 0
         ;;
     *)
