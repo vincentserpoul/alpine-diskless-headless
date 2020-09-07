@@ -22,7 +22,7 @@
 #   -t TARGET_DIR               dir where tar.gz will be created
 #                               Default: config dir
 #
-#   -w TARGET_HW                which SMB you are targeting.
+#   -H TARGET_HW                which SMB you are targeting.
 #                               Options: rpi
 #                               Default: rpi
 #
@@ -61,12 +61,12 @@ if [[ ! -d "$DIR_BASE" ]]; then DIR_BASE="$PWD"; fi
 
 #===================================  M e n u  ================================#
 
-while getopts 'c:a:t:w:d:fh' OPTION; do
+while getopts 'c:a:t:H:d:fh' OPTION; do
     case "$OPTION" in
     c) CONFIG_FILE_PATH="$OPTARG" ;;
     a) ADDITIONAL_PROVISIONERS="$OPTARG" ;;
     t) TARGET_DIR="$OPTARG" ;;
-    w) TARGET_HW="$OPTARG" ;;
+    H) TARGET_HW="$OPTARG" ;;
     d) DEVICE_NAME="$OPTARG" ;;
     f) FORCE_DEV_WRITE=true ;;
     h)
@@ -103,7 +103,7 @@ if [[ -z ${TARGET_HW+x} ]]; then
 fi
 
 # hardware boot
-"$DIR_BASE"/hw/build.sh -c "$CONFIG_FILE_PATH" -t "$TARGET_DIR" -w "$TARGET_HW"
+"$DIR_BASE"/hw/build.sh -c "$CONFIG_FILE_PATH" -t "$TARGET_DIR" -H "$TARGET_HW"
 
 # if hardware not specified, we don't continue
 if [[ -z ${DEVICE_NAME+x} ]]; then

@@ -20,11 +20,11 @@ if [[ ! -d "$BUILD_HW_DIR" ]]; then BUILD_HW_DIR="$PWD"; fi
 
 #===================================  M e n u  ================================#
 
-while getopts 'c:t:w:h' OPTION; do
+while getopts 'c:t:H:h' OPTION; do
     case "$OPTION" in
     c) CONFIG_FILE_PATH="$OPTARG" ;;
     t) TARGET_DIR="$OPTARG" ;;
-    w) TARGET_HW="$OPTARG" ;;
+    H) TARGET_HW="$OPTARG" ;;
     h)
         echo "alpine-diskless-headless-hw-build v""$VERSION"""
         exit 0

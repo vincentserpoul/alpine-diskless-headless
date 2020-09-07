@@ -62,7 +62,7 @@ docker build -t vincentserpoul/funicular ./ -f ./Dockerfile
 #   -t TARGET_DIR               dir where tar.gz will be created
 #                               Default: config dir
 #
-#   -w TARGET_HW                which SMB you are targeting.
+#   -H TARGET_HW                which SMB you are targeting.
 #                               Options: rpi
 #                               Default: rpi
 #

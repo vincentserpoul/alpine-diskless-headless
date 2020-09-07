@@ -44,9 +44,9 @@ CMD ["/bin/bash"]
 
 # docker build -t vincentserpoul/funicular ./ -f ./Dockerfile
 
-# docker run -it --name funicular-apk-build --rm --privileged \
+# docker run -it --name funicular --rm --privileged \
 #     --mount type=bind,source="$(pwd)"/example/pleine-lune-rpi3b+,target=/apk/config \
 #     --mount type=bind,source="$(pwd)"/example/pleine-lune-rpi3b+/target,target=/target \
 #     --mount type=bind,source="$(pwd)"/example/pleine-lune-rpi3b+/provisioners,target=/apk/additional_provisioners,readonly \
 #     --device /dev/sda \
-#     vincentserpoul/funicular -w rpi -d /dev/sda -f
+#     vincentserpoul/funicular -H rpi -d /dev/sda -f
