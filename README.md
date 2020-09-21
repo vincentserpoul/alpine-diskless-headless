@@ -131,11 +131,12 @@ Then, we ll create a proper command cli, in order to handle configuration a bit 
 # TODO
 
 - [x] use docker
-- [ ] try fakechroot
+- [ ] [ufw](https://wiki.alpinelinux.org/wiki/Uncomplicated_Firewall)
 - [ ] encrypt lbu
+- [ ] build with alpine, ofc
+- [ ] try fakechroot
 - [x] use a rust cli (see vincentserpoul/funicular)
 - [ ] encrypt secrets (using [age](https://github.com/FiloSottile/age) or [sops](https://github.com/mozilla/sops) )
-- [ ] [ufw](https://wiki.alpinelinux.org/wiki/Uncomplicated_Firewall)
 
 # THANKS
 

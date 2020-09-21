@@ -20,10 +20,13 @@ additional-provisioners-copy() {
     local -r ROOTFS_DIR=$1
     local -r ADD_PROV_FOLDER=$2
 
-    if [[ -d "$ADD_PROV_FOLDER" ]]; then
+    if [ "$(find "$ADD_PROV_FOLDER" -mindepth 1 -print -quit 2>/dev/null)" ]; then
         einfo "copying additional provisioners present in folder $ADD_PROV_FOLDER"
 
         # copy the setup scripts inside the rootfs
-        cp -r "$ADD_PROV_FOLDER"/* "$ROOTFS_DIR"/install-scripts/provisioners/
+        cp -a "$ADD_PROV_FOLDER/*" "$ROOTFS_DIR"/install-scripts/provisioners/
+    else
+        einfo "no additional provisioner to copy"
     fi
+
 }

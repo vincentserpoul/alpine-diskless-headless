@@ -24,11 +24,11 @@ alpine-setup-prepare() {
 
     # copy the setup scripts inside the rootfs
     mkdir -p "$ROOTFS_DIR"/install-scripts
-    cp -r "$BUILD_DIR"/scripts/chroot/* "$ROOTFS_DIR"/install-scripts/
+    cp -a "$BUILD_DIR"/scripts/chroot/* "$ROOTFS_DIR"/install-scripts/
 
     # copy the config inside the rootfs
     mkdir -p "$ROOTFS_DIR"/config
-    cp -r "$LOCAL_CONFIG_DIR"/* "$ROOTFS_DIR"/config/
+    cp -a "$LOCAL_CONFIG_DIR"/* "$ROOTFS_DIR"/config/
 
 }
 
