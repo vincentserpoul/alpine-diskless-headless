@@ -86,11 +86,6 @@ done
 
 root-check
 
-# Check if device name is filled
-if [ -z "$DEVICE_NAME" ]; then
-    die "you need to specify a device with -d option. for example: -d /dev/sda"
-fi
-
 einfo "running alpine-diskless-headless-run"
 
 # apk
