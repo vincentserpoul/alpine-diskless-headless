@@ -3,7 +3,7 @@ FROM debian:buster-slim
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
     wget \
-    binfmt-support qemu-user-static ssh \
+    binfmt-support qemu-user-static ssh
 
 COPY ./apk/scripts /apk/scripts
 COPY ./apk/build.sh /apk/build.sh

@@ -19,6 +19,8 @@ set -eu
 provisioner_k3s_install_pkg() {
     apk add curl
 
+    mkdir -p "$PROVISIONER_K3S_DATA_DIR"
+
     curl -sfL https://get.k3s.io |
         INSTALL_K3S_EXEC="$PROVISIONER_K3S_EXEC" \
             sh -s - \
@@ -28,7 +30,6 @@ provisioner_k3s_install_pkg() {
             --data-dir "$PROVISIONER_K3S_DATA_DIR" || true
 
     lbu add "$PROVISIONER_K3S_DATA_DIR"
-
 }
 
 #==============================================================================#
