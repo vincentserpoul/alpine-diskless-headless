@@ -7,29 +7,46 @@ set -eu
 #===============================  e n v  v a r s  =============================#
 
 # user config
-# PROVISIONER_K3S_TOKEN_VALUE: server token
-: "${PROVISIONER_K3S_TOKEN_VALUE?Need to set PROVISIONER_K3S_TOKEN_VALUE}"
-# PROVISIONER_K3S_K3S_ARGS: args for the k3s (agent or server)
 : "${PROVISIONER_K3S_EXEC?Need to set PROVISIONER_K3S_EXEC}"
-# PROVISIONER_K3S_DATA_DIR: datadir
-: "${PROVISIONER_K3S_DATA_DIR?Need to set PROVISIONER_K3S_DATA_DIR}"
+
+# edge
+# : "${PROVISIONER_K3S_EXEC_EDGE?Need to set PROVISIONER_K3S_EXEC}"
+# : "${PROVISIONER_K3S_OPTS_EDGE?Need to set PROVISIONER_K3S_OPTS}"
 
 #===================================  k 3 s  ==================================#
 
 provisioner_k3s_install_pkg() {
     apk add curl
 
-    mkdir -p "$PROVISIONER_K3S_DATA_DIR"
-
     curl -sfL https://get.k3s.io |
-        INSTALL_K3S_EXEC="$PROVISIONER_K3S_EXEC" \
-            sh -s - \
-            --token "$PROVISIONER_K3S_TOKEN_VALUE" \
-            --node-name "$BASE_HOSTNAME" \
-            --node-label "$BASE_ARCH" \
-            --data-dir "$PROVISIONER_K3S_DATA_DIR" || true
+        INSTALL_K3S_EXEC="$BASE_HOSTNAME $PROVISIONER_K3S_EXEC" \
+            sh -s - || true
 
-    lbu add "$PROVISIONER_K3S_DATA_DIR"
+    lbu add /usr/local/bin/k3s
+
+    lbu add /usr/local/bin/kubectl
+    lbu add /usr/local/bin/crictl
+    lbu add /usr/local/bin/ctr
+    lbu add /usr/local/bin/k3s-killall.sh
+    lbu add /usr/local/bin/k3s-test-uninstall.sh
+
+    lbu add /etc/rancher
+    lbu add /etc/init.d/k3s-"$BASE_HOSTNAME"
+}
+
+provisioner_k3s_install_pkg_edge() {
+    # shellcheck disable=SC2034
+    K3S_EXEC=$PROVISIONER_K3S_EXEC_EDGE
+    # shellcheck disable=SC2034
+    K3S_OPTS=$PROVISIONER_K3S_OPTS_EDGE
+
+    apk add -X http://dl-cdn.alpinelinux.org/alpine/edge/community \
+        cni-plugins
+
+    apk add -X http://dl-cdn.alpinelinux.org/alpine/edge/testing \
+        k3s
+
+    rc-update add k3s default
 }
 
 #==============================================================================#
