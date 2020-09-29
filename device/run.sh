@@ -4,7 +4,7 @@ set -euo pipefail
 
 #==============================================================================#
 
-readonly VERSION="1.0.0"
+readonly VERSION=$(git describe --tags --abbrev=0)
 
 #============================== i n c l u d e s ===============================#
 
@@ -26,7 +26,7 @@ while getopts 's:d:fh' OPTION; do
     d) DEVICE_NAME="$OPTARG" ;;
     f) FORCE_DEV_WRITE=true ;;
     h)
-        echo "alpine-diskless-headless-dev-run v""$VERSION"""
+        echo "alpine-diskless-headless-dev-run ""$VERSION"""
         exit 0
         ;;
     *)

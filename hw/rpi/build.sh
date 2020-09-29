@@ -4,7 +4,7 @@ set -euo pipefail
 
 #==============================================================================#
 
-readonly VERSION="2.0.0"
+readonly VERSION=$(git describe --tags --abbrev=0)
 
 #============================== i n c l u d e s ===============================#
 
@@ -27,7 +27,7 @@ while getopts 'c:t:h' OPTION; do
     c) CONFIG_FILE_PATH="$OPTARG" ;;
     t) TARGET_DIR="$OPTARG" ;;
     h)
-        echo "alpine-diskless-headless-hw-rpi-build v""$VERSION"""
+        echo "alpine-diskless-headless-hw-rpi-build ""$VERSION"""
         exit 0
         ;;
     *)
