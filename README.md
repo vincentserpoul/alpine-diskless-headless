@@ -26,7 +26,7 @@ docker run -it --name funicular-apk-build --rm --privileged \
     --mount type=bind,source="$(pwd)"/example/pleine-lune-rpi3b+/target,target=/target \
     --mount type=bind,source="$(pwd)"/example/pleine-lune-rpi3b+/provisioners,target=/apk/additional_provisioners,readonly \
     --device /dev/sda \
-    vincentserpoul/funicular -w rpi -d /dev/sda -f
+    vincentserpoul/funicular -wHrpi -d /dev/sda -f
 ```
 
 ### building it
@@ -50,7 +50,7 @@ docker build -t vincentserpoul/funicular ./ -f ./Dockerfile
 # It has a few dependencies: wget, binfmt-support, qemu-user-static, ssh, parted, dosfstools
 #
 # Example:
-#   sudo ./run.sh -c "$(pwd)"/example/pleine-lune-rpi3b+/config.env -t "$(pwd)"/example/pleine-lune-rpi3b+/target -w rpi -d /dev/sda -f
+#   sudo ./run.sh -c "$(pwd)"/example/pleine-lune-rpi3b+/config.env -t "$(pwd)"/example/pleine-lune-rpi3b+/target -H rpi -d /dev/sda -f
 #
 # Options and environment variables:
 #
@@ -91,7 +91,7 @@ You have a rpi3B+, you want to set it with a hostname "pleine-lune" and want to 
 modify accordingly and run
 
 ```bash
-sudo ./run.sh -c "$(pwd)"/example/pleine-lune-rpi3b+/config.env -t "$(pwd)"/example/pleine-lune-rpi3b+/target -w rpi -d /dev/sda -f
+sudo ./run.sh -c "$(pwd)"/example/pleine-lune-rpi3b+/config.env -t "$(pwd)"/example/pleine-lune-rpi3b+/target -H rpi -d /dev/sda -f
 ```
 
 ### rpi0
@@ -101,7 +101,7 @@ You have a rpi0, you want to set it with a hostname "pleine-lune" and can only u
 modify accordingly and run
 
 ```bash
-sudo ./run.sh -c "$(pwd)"/example/pleine-lune-rpi0/config.env -t "$(pwd)"/example/pleine-lune-rpi0/target -w rpi -d /dev/sda -f
+sudo ./run.sh -c "$(pwd)"/example/pleine-lune-rpi0/config.env -t "$(pwd)"/example/pleine-lune-rpi0/target -H rpi -d /dev/sda -f
 ```
 
 ### Accessing the rpi
