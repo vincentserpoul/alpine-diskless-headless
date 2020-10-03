@@ -4,4 +4,4 @@ RUN apk update && apk add openrc alpine-conf --no-cache
 
 CMD ["/bin/sh"]
 
-# docker build -t vincentserpoul/funicular-test ./ -f ./tests/Dockerfile
+# docker build -t vincentserpoul/alpine-diskless-headless-test ./ -f ./tests/Dockerfile

@@ -15,7 +15,7 @@ jobs:
       - name: Prepare
         id: prep
         run: |
-          DOCKER_IMAGE="vincentserpoul/funicular"
+          DOCKER_IMAGE="vincentserpoul/alpine-diskless-headless"
           VERSION=noop
           if [ "${{ github.event_name }}" = "schedule" ]; then
             VERSION=nightly

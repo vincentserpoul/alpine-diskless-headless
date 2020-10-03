@@ -17,7 +17,7 @@ docker run -dit --name test-"$PROVISIONER" \
     --mount type=bind,source="$(pwd)"/apk/scripts/chroot/provisioners,target=/provisioners,readonly \
     --mount type=bind,source="$(pwd)"/tests/apk/scripts/chroot/provisioners,target=/tests/provisioners,readonly \
     --env-file "$(pwd)"/tests/apk/scripts/chroot/provisioners/"$PROVISIONER".env \
-    vincentserpoul/funicular-test /bin/sh
+    vincentserpoul/alpine-diskless-headless-test /bin/sh
 
 # Run provisioner
 docker exec -it test-"$PROVISIONER" /bin/sh -c "/provisioners/$PROVISIONER.sh" || ewarn "$PROVISIONER failed"

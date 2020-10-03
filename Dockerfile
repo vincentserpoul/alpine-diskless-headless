@@ -42,11 +42,11 @@ ENTRYPOINT ["/run.sh", "-c", "/apk/config/config.env", "-a", "/apk/additional_pr
 
 CMD ["/bin/bash"]
 
-# docker build -t vincentserpoul/funicular ./ -f ./Dockerfile
+# docker build -t vincentserpoul/alpine-diskless-headless ./ -f ./Dockerfile
 
-# docker run -it --name funicular --rm --privileged \
+# docker run -it --name alpine-diskless-headless --rm --privileged \
 #     --mount type=bind,source="$(pwd)"/example/pleine-lune-rpi3b+,target=/apk/config \
 #     --mount type=bind,source="$(pwd)"/example/pleine-lune-rpi3b+/target,target=/target \
 #     --mount type=bind,source="$(pwd)"/example/pleine-lune-rpi3b+/provisioners,target=/apk/additional_provisioners,readonly \
 #     --device /dev/sda \
-#     vincentserpoul/funicular -H rpi -d /dev/sda -f
+#     vincentserpoul/alpine-diskless-headless -H rpi -d /dev/sda -f

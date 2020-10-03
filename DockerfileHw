@@ -18,9 +18,9 @@ ENTRYPOINT ["/hw/build.sh", "-c", "/config/config.env", "-t", "/target"]
 
 CMD ["/bin/bash"]
 
-# docker build -t vincentserpoul/funicular-hw ./ -f ./DockerfileHw
+# docker build -t vincentserpoul/alpine-diskless-headless-hw ./ -f ./DockerfileHw
 
-# docker run -it --name funicular-hw-build --rm --privileged \
+# docker run -it --name alpine-diskless-headless-hw-build --rm --privileged \
 #     --mount type=bind,source="$(pwd)"/example/pleine-lune-rpi3b+,target=/config \
 #     --mount type=bind,source="$(pwd)"/example/pleine-lune-rpi3b+/target,target=/target \
-#     vincentserpoul/funicular-hw -w rpi
+#     vincentserpoul/alpine-diskless-headless-hw -w rpi

@@ -22,10 +22,10 @@ ENTRYPOINT ["/apk/build.sh", "-c", "/apk/config/config.env", "-a", "/apk/additio
 
 CMD ["/bin/bash"]
 
-# docker build -t vincentserpoul/funicular-apk ./ -f ./DockerfileApk
+# docker build -t vincentserpoul/alpine-diskless-headless-apk ./ -f ./DockerfileApk
 
-# docker run -it --name funicular-apk-build --rm --privileged \
+# docker run -it --name alpine-diskless-headless-apk-build --rm --privileged \
 #     --mount type=bind,source="$(pwd)"/example/pleine-lune-rpi3b+,target=/apk/config \
 #     --mount type=bind,source="$(pwd)"/example/pleine-lune-rpi3b+/target,target=/target \
 #     --mount type=bind,source="$(pwd)"/example/pleine-lune-rpi3b+/provisioners,target=/apk/additional_provisioners,readonly \
-#     vincentserpoul/funicular-apk
+#     vincentserpoul/alpine-diskless-headless-apk
