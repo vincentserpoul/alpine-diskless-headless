@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+set -Eeuo pipefail
 
 #==============================================================================#
 
 #============================== i n c l u d e s ===============================#
 
-DIR_PREDL="${BASH_SOURCE%/*}"
+DIR_PREDL=$(realpath "$(dirname "${BASH_SOURCE[0]}")")
 if [[ ! -d "$DIR_PREDL" ]]; then DIR_PREDL="$PWD"; fi
 
 mkdir -p "$DIR_PREDL/downloads"

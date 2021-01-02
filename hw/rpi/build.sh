@@ -1,14 +1,10 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
-
-#==============================================================================#
-
-readonly VERSION="0.1.3"
+set -Eeuo pipefail
 
 #============================== i n c l u d e s ===============================#
 
-BUILD_DIR="${BASH_SOURCE%/*}"
+BUILD_DIR=$(realpath "$(dirname "${BASH_SOURCE[0]}")")
 if [[ ! -d "$BUILD_DIR" ]]; then BUILD_DIR="$PWD"; fi
 
 # shellcheck source=/dev/null
@@ -22,29 +18,44 @@ if [[ ! -d "$BUILD_DIR" ]]; then BUILD_DIR="$PWD"; fi
 
 #===================================  M e n u  ================================#
 
-while getopts 'c:t:h' OPTION; do
-    case "$OPTION" in
-    c) CONFIG_FILE_PATH="$OPTARG" ;;
-    t) TARGET_DIR="$OPTARG" ;;
-    h)
-        echo "alpine-diskless-headless-hw-rpi-build ""$VERSION"""
-        exit 0
-        ;;
-    *)
-        echo "unknown flag"
-        exit 0
-        ;;
-    esac
-done
+parse_params() {
+    CONFIG_FILE_PATH=''
+
+    while :; do
+        case "${1-}" in
+        -h | --help) usage ;;
+        -v | --verbose) set -x ;;
+        -c | --config-file-path)
+            CONFIG_FILE_PATH="${2-}"
+            shift
+            ;;
+        -t | --target-dir)
+            TARGET_DIR="${2-}"
+            shift
+            ;;
+        -?*) die "Unknown option: $1" ;;
+        *) break ;;
+        esac
+        shift
+    done
+
+    # args=("$@")
+
+    # check required params and arguments
+    [[ -z "${CONFIG_FILE_PATH+x}" ]] && die "Missing required parameter: -c config file path"
+
+    # [[ ${#args[@]} -eq 0 ]] && die "Missing script arguments"
+
+    return 0
+}
+
+parse_params "$@"
 
 #================================  c o n f i g  ===============================#
 
 einfo "checking config"
 
 # check if config is present
-if [[ -z ${CONFIG_FILE_PATH+x} ]]; then
-    die "you need to supply a config path -c <CONFIG_FILE_PATH>"
-fi
 if [[ ! -f "$CONFIG_FILE_PATH" ]]; then
     die "the config path you supplied is not valid"
 fi

@@ -26,7 +26,7 @@ docker run -it --name alpine-diskless-headless-apk-build --rm --privileged \
     --mount type=bind,source="$(pwd)"/example/pleine-lune-rpi3b+/target,target=/target \
     --mount type=bind,source="$(pwd)"/example/pleine-lune-rpi3b+/provisioners,target=/apk/additional_provisioners,readonly \
     --device /dev/sda \
-    vincentserpoul/alpine-diskless-headless -wHrpi -d /dev/sda -f
+    vincentserpoul/alpine-diskless-headless -H rpi -d /dev/sda -f
 ```
 
 ### building it
@@ -135,7 +135,7 @@ Then, we ll create a proper command cli, in order to handle configuration a bit 
 - [ ] encrypt lbu
 - [ ] build with alpine, ofc
 - [ ] try fakechroot
-- [x] use a rust cli (see vincentserpoul/alpine-diskless-headless)
+- [x] use a rust cli (see vincentserpoul/funicular)
 - [ ] encrypt secrets (using [age](https://github.com/FiloSottile/age) or [sops](https://github.com/mozilla/sops) )
 
 # THANKS

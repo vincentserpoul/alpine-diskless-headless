@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+set -Eeuo pipefail
 
 #==============================================================================#
 
 #============================== i n c l u d e s ===============================#
 
-DIR_BOOT="${BASH_SOURCE%/*}"
+DIR_BOOT=$(realpath "$(dirname "${BASH_SOURCE[0]}")")
 if [[ ! -d "$DIR_BOOT" ]]; then DIR_BOOT="$PWD"; fi
 
 # shellcheck source=/dev/null

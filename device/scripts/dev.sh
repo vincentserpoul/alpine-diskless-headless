@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+set -Eeuo pipefail
 
 #==============================================================================#
 
 #============================== i n c l u d e s ===============================#
 
-DIR_DEVICE="${BASH_SOURCE%/*}"
+DIR_DEVICE=$(realpath "$(dirname "${BASH_SOURCE[0]}")")
 if [[ ! -d "$DIR_DEVICE" ]]; then DIR_DEVICE="$PWD"; fi
 
 # shellcheck source=/dev/null

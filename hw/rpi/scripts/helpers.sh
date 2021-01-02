@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+set -Eeuo pipefail
 
 #==============================================================================#
 
-DIR_RPI_HELPERS="${BASH_SOURCE%/*}"
+DIR_RPI_HELPERS=$(realpath "$(dirname "${BASH_SOURCE[0]}")")
 if [[ ! -d "$DIR_RPI_HELPERS" ]]; then DIR_RPI_HELPERS="$PWD"; fi
 
 #==============================================================================#

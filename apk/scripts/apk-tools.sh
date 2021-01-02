@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+set -Eeuo pipefail
 
 #==============================================================================#
 
 #============================== i n c l u d e s ===============================#
 
-DIR_APK_TOOLS="${BASH_SOURCE%/*}"
+DIR_APK_TOOLS=$(realpath "$(dirname "${BASH_SOURCE[0]}")")
 if [[ ! -d "$DIR_APK_TOOLS" ]]; then DIR_APK_TOOLS="$PWD"; fi
 
 # shellcheck source=/dev/null

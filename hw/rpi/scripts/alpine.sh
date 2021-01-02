@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+set -Eeuo pipefail
 
 #==============================================================================#
 
 #============================== i n c l u d e s ===============================#
 
-DIR_ALPINE="${BASH_SOURCE%/*}"
+DIR_ALPINE=$(realpath "$(dirname "${BASH_SOURCE[0]}")")
 if [[ ! -d "$DIR_ALPINE" ]]; then DIR_ALPINE="$PWD"; fi
 
 # shellcheck source=/dev/null

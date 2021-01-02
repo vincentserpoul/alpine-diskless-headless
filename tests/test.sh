@@ -2,7 +2,7 @@
 
 set -uo pipefail
 
-DIR_TEST="${BASH_SOURCE%/*}"
+DIR_TEST=$(realpath "$(dirname "${BASH_SOURCE[0]}")")
 if [[ ! -d "$DIR_TEST" ]]; then DIR_TEST="$PWD"; fi
 
 # shellcheck source=/dev/null

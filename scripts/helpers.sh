@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+set -Eeuo pipefail
 
 #==============================================================================#
 
 #============================== i n c l u d e s ===============================#
 
-DIR_HELPERS="${BASH_SOURCE%/*}"
+DIR_HELPERS=$(realpath "$(dirname "${BASH_SOURCE[0]}")")
 if [[ ! -d "$DIR_HELPERS" ]]; then DIR_HELPERS="$PWD"; fi
 
 # shellcheck source=/dev/null

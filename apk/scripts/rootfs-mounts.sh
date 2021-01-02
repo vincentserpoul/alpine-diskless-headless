@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+set -Eeuo pipefail
 
 #==============================================================================#
 
 #============================== i n c l u d e s ===============================#
 
-DIR_ROOTFS="${BASH_SOURCE%/*}"
+DIR_ROOTFS=$(realpath "$(dirname "${BASH_SOURCE[0]}")")
 if [[ ! -d "$DIR_ROOTFS" ]]; then DIR_ROOTFS="$PWD"; fi
 
 # shellcheck source=/dev/null
