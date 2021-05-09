@@ -1,4 +1,4 @@
-FROM debian:buster-slim
+FROM debian:bullseye-slim
 
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
@@ -40,7 +40,7 @@ VOLUME ["/apk/additional_provisioners"]
 
 ENTRYPOINT ["/run.sh", "-c", "/apk/config/config.env", "-a", "/apk/additional_provisioners", "-t", "/target"]
 
-CMD ["/bin/bash"]
+# CMD ["/bin/bash"]
 
 # docker build -t vincentserpoul/alpine-diskless-headless ./ -f ./Dockerfile
 

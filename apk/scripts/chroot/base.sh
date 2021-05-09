@@ -32,7 +32,7 @@ alpine_setup_hostname() {
 #===============================  e n v  v a r s  =============================#
 
 : "${BASE_ALPINE_MIRROR?Need to set BASE_ALPINE_MIRROR (http:\/\/dl-cdn.alpinelinux.org\/alpine...)}"
-: "${BASE_ALPINE_BRANCH?Need to set BASE_ALPINE_BRANCH (latest-stable...)}"
+: "${BASE_ALPINE_BRANCH?Need to set BASE_ALPINE_BRANCH (v3.13...)}"
 
 #==============================================================================#
 

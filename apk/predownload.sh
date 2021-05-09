@@ -15,5 +15,5 @@ if [[ ! -d "$DIR_PREDL" ]]; then DIR_PREDL="$PWD"; fi
 . """$DIR_PREDL""/scripts/apk-tools.sh"
 
 mkdir -p "$DIR_PREDL/downloads"
-apk-tools-download "aarch64" "http://dl-cdn.alpinelinux.org/alpine" "latest-stable" "$DIR_PREDL/downloads"
-apk-tools-download "armhf" "http://dl-cdn.alpinelinux.org/alpine" "latest-stable" "$DIR_PREDL/downloads"
+apk-tools-download "aarch64" "http://dl-cdn.alpinelinux.org/alpine" "v3.13" "$DIR_PREDL/downloads"
+apk-tools-download "armhf" "http://dl-cdn.alpinelinux.org/alpine" "v3.13" "$DIR_PREDL/downloads"
