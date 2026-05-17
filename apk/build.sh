@@ -145,7 +145,8 @@ CONFIG_FILE_PATH="$(cd "$(dirname "$CONFIG_FILE_PATH")" && pwd)/$(basename "$CON
 # shellcheck source=/dev/null
 . "$CONFIG_FILE_PATH"
 
-readonly CONFIG_DIR=$(dirname "$CONFIG_FILE_PATH")
+CONFIG_DIR=$(dirname "$CONFIG_FILE_PATH")
+readonly CONFIG_DIR
 
 # check if hostname is filled
 helpers-base-hostname-check
@@ -161,7 +162,7 @@ if [[ ! -d "$TARGET_DIR" ]]; then
     die "$TARGET_DIR is not a dir"
 fi
 
-#===============================  r o o t f s   ===============================#
+#================================  r o o t f s  ===============================#
 
 einfo "preparing rootfs"
 
@@ -172,6 +173,13 @@ fi
 rootfs-unmount-all "$ROOTFS_DIRECTORY"
 rm -rf "$ROOTFS_DIRECTORY"
 mkdir -p "$ROOTFS_DIRECTORY"
+
+#================================  b r a n c h  ===============================#
+
+BASE_ALPINE_BRANCH=v$(echo "$BASE_ALPINE_VERSION" | cut -f1,2 -d".")
+readonly BASE_ALPINE_BRANCH
+
+einfo "setting branch to $BASE_ALPINE_BRANCH"
 
 #===============================  a p k o v l   ===============================#
 

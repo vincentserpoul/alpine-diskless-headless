@@ -22,8 +22,9 @@ WORKDIR /build
 ENV ALPINE_VERSION=$ALPINE_VERSION
 
 CMD /src/aports/scripts/mkimage.sh \
-    --tag $(ALPINE_VERSION) \
+    --tag $ALPINE_VERSION \
     --arch aarch64 \
     --repository http://dl-cdn.alpinelinux.org/alpine/v$(echo $ALPINE_VERSION | cut -f1,2 -d".")/main \
     --extra-repository http://dl-cdn.alpinelinux.org/alpine/v$(echo $ALPINE_VERSION | cut -f1,2 -d".")/community \
-    --profile rpi
+    --profile adh \
+    --hostkeys

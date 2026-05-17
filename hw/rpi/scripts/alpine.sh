@@ -54,3 +54,19 @@ alpine-extract() {
 
     tar xzf "$FILE_PATH" -C "$WORK_DIR"
 }
+
+#============================== e x
+
+alpine-extract-adh() {
+    local -r ARCH=$1
+    local -r ALPINE_VERSION=$2
+
+    local -r FILE_PATH="$(helpers-download-filepath-get "$ARCH" "$ALPINE_VERSION")"
+
+    einfo "extracting rpi alpine ""$ALPINE_VERSION"" for ""$ARCH"""
+
+    local -r WORK_DIR="$(helpers-workdir-name-get """$ARCH""" """$ALPINE_VERSION""")"
+    mkdir -p "$WORK_DIR"
+
+    tar xzf "$FILE_PATH" -C "$WORK_DIR"
+}

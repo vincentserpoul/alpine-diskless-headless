@@ -144,3 +144,4 @@ Then, we ll create a proper command cli, in order to handle configuration a bit 
 - https://github.com/knoopx/alpine-raspberry-pi
 - https://github.com/yangxuan8282/gen-rpi_os/blob/master/gen-alpine_rpi.sh
 - https://hütter.ch/posts/pitaya-alpine/#preparations
+- https://gitlab.alpinelinux.org/alpine/aports

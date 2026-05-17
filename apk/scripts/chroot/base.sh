@@ -32,7 +32,9 @@ alpine_setup_hostname() {
 #===============================  e n v  v a r s  =============================#
 
 : "${BASE_ALPINE_MIRROR?Need to set BASE_ALPINE_MIRROR (http:\/\/dl-cdn.alpinelinux.org\/alpine...)}"
-: "${BASE_ALPINE_BRANCH?Need to set BASE_ALPINE_BRANCH (v3.13...)}"
+: "${BASE_ALPINE_VERSION?Need to set BASE_ALPINE_VERSION (3.13.5 ...)}"
+
+BASE_ALPINE_BRANCH=v$(echo "$BASE_ALPINE_VERSION" | cut -f1,2 -d".")
 
 #==============================================================================#
 
@@ -226,7 +228,6 @@ alpine_setup_install_essentials() {
 
     apk add \
         openssh rsync sudo eudev haveged chrony avahi dbus tzdata
-
 }
 
 alpine_setup_initd() {
@@ -235,9 +236,13 @@ alpine_setup_initd() {
         rc-update add "$service" sysinit
     done
 
-    for service in modules sysctl hostname bootmisc swclock syslog swap reinstall-pkg; do
+    for service in modules sysctl hostname bootmisc swclock syslog swap; do
         rc-update add "$service" boot
     done
+
+    # for service in reinstall-pkg; do
+    #     rc-update add "$service" boot
+    # done
 
     for service in dbus haveged sshd chronyd local networking avahi-daemon; do
         rc-update add "$service" default
@@ -263,7 +268,7 @@ alpine_setup_install_essentials
 alpine_setup_keymap "$BASE_ALPINE_KEYMAP"
 alpine_setup_timezone "$BASE_ALPINE_TIMEZONE"
 alpine_setup_networking
-alpine_setup_reinstall_pkg_boot
+# alpine_setup_reinstall_pkg_boot
 alpine_setup_initd
 alpine_setup_user "$BASE_USERS_ROOT_PASSWORD" "$BASE_USERS_REMOTE_USER" "$BASE_USERS_REMOTE_USER_PASSWORD"
 alpine_setup_ssh "$BASE_SSH_AUTHORIZED_KEYS" "$BASE_USERS_REMOTE_USER"

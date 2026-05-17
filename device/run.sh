@@ -119,6 +119,12 @@ if [[ ! -b "$DEVICE_NAME" ]]; then
     die "$DEVICE_NAME does not exist"
 fi
 
+#=====================================  a r c h  ==============================#
+
+einfo "checking arch"
+
+ARCH=${ARCH:-'aarch64'}
+
 #===================================  M a i n  ================================#
 
 root-check
@@ -135,14 +141,16 @@ fi
 
 dev-partition-full "$DEVICE_NAME"
 
-readonly BOOT_MOUNT_POINT="$(dev-boot-mount "$DEVICE_NAME")"
+BOOT_MOUNT_POINT="$(dev-boot-mount "$DEVICE_NAME")"
 einfo "copying boot files and local backup to boot partition"
 tar xzf "$SOURCE_DIR"/alpine.boot.tar.gz --no-same-owner -C "$BOOT_MOUNT_POINT"
 cp "$SOURCE_DIR"/alpine.apkovl.tar.gz "$BOOT_MOUNT_POINT"
 dev-boot-umount "$DEVICE_NAME"
+readonly BOOT_MOUNT_POINT
 
-readonly DISK_MOUNT_POINT="$(dev-disk-mount "$DEVICE_NAME")"
+DISK_MOUNT_POINT="$(dev-disk-mount "$DEVICE_NAME")"
 einfo "extracting apk cache to main ext4 partition"
-mkdir -p "$DISK_MOUNT_POINT"/var/cache/apk
-tar xzf "$SOURCE_DIR"/alpine.apkcache.tar.gz -C "$DISK_MOUNT_POINT"/var/cache/apk
+mkdir -p "$DISK_MOUNT_POINT"/apks/"$ARCH"
+tar xzf "$SOURCE_DIR"/alpine.apkcache.tar.gz -C "$DISK_MOUNT_POINT"/apks/"$ARCH"
 dev-disk-umount "$DEVICE_NAME"
+readonly DISK_MOUNT_POINT

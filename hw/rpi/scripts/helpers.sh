@@ -29,3 +29,17 @@ helpers-download-filepath-get() {
 
     echo "$DIR_RPI_HELPERS"/../downloads/"$(helpers-download-tar-name-get "$ARCH" "$ALPINE_VERSION")"
 }
+
+helpers-download-tar-name-get-adh() {
+    local -r ARCH=$1
+    local -r ALPINE_VERSION=$2
+
+    echo "alpine-adh-""$ALPINE_VERSION""-""$ARCH"".tar.gz"
+}
+
+helpers-download-filepath-get-adh() {
+    local -r ARCH=$1
+    local -r ALPINE_VERSION=$2
+
+    echo "$DIR_RPI_HELPERS"/../downloads/"$(helpers-download-tar-name-get-adh "$ARCH" "$ALPINE_VERSION")"
+}
